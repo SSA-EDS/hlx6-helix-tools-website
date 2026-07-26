@@ -17,18 +17,18 @@ Detailed checklist for reviewing Edge Delivery Services pull requests. Use this 
 
 ### Preview URL Format
 
-Both `.aem.page` and `.aem.live` domains are accepted:
+Both `.entmseds.page` and `.entmseds.live` domains are accepted:
 
 ```
-Before: https://main--{repo}--{owner}.aem.page/{path-to-test-content}
-After: https://{branch}--{repo}--{owner}.aem.page/{path-to-test-content}
+Before: https://main--{repo}--{owner}.entmseds.page/{path-to-test-content}
+After: https://{branch}--{repo}--{owner}.entmseds.page/{path-to-test-content}
 ```
 
 or
 
 ```
-Before: https://main--{repo}--{owner}.aem.live/{path-to-test-content}
-After: https://{branch}--{repo}--{owner}.aem.live/{path-to-test-content}
+Before: https://main--{repo}--{owner}.entmseds.live/{path-to-test-content}
+After: https://{branch}--{repo}--{owner}.entmseds.live/{path-to-test-content}
 ```
 
 ### PR Description Template
@@ -41,8 +41,8 @@ After: https://{branch}--{repo}--{owner}.aem.live/{path-to-test-content}
 Fix #<issue-number>
 
 ## Test URLs
-- Before: https://main--{repo}--{owner}.aem.live/{path}
-- After: https://{branch}--{repo}--{owner}.aem.live/{path}
+- Before: https://main--{repo}--{owner}.entmseds.live/{path}
+- After: https://{branch}--{repo}--{owner}.entmseds.live/{path}
 
 ## Types of Changes
 - [ ] Bug fix
@@ -239,10 +239,10 @@ main .hero .button {
 ```bash
 # Check preview URLs with PSI
 # Mobile
-https://pagespeed.web.dev/analysis?url=https://{branch}--{repo}--{owner}.aem.page/{path}&form_factor=mobile
+https://pagespeed.web.dev/analysis?url=https://{branch}--{repo}--{owner}.entmseds.page/{path}&form_factor=mobile
 
 # Desktop
-https://pagespeed.web.dev/analysis?url=https://{branch}--{repo}--{owner}.aem.page/{path}&form_factor=desktop
+https://pagespeed.web.dev/analysis?url=https://{branch}--{repo}--{owner}.entmseds.page/{path}&form_factor=desktop
 ```
 
 ---

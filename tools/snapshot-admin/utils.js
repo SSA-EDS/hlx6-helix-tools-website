@@ -4,8 +4,8 @@ import { executeAdminRequest, AuthMode } from '../../utils/admin-request.js';
 function formatResources(org, site, name, resources) {
   return resources.map((res) => ({
     path: res.path,
-    aemPreview: `https://main--${site}--${org}.aem.page${res.path}`,
-    url: `https://${name}--main--${site}--${org}.aem.reviews${res.path}`,
+    aemPreview: `https://main--${site}--${org}.entmseds.page${res.path}`,
+    url: `https://${name}--main--${site}--${org}.entmseds.reviews${res.path}`,
   }));
 }
 

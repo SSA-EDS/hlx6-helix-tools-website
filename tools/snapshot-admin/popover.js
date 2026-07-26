@@ -58,9 +58,9 @@ async function updateSnapshotUI() {
   // Update links
   REVIEWS_LINK.href = customReviewHost
     ? `https://${customReviewHost}${PATHNAME}`
-    : `https://${currentSnapshot}--main--${REPO}--${OWNER}.aem.reviews${PATHNAME}`;
+    : `https://${currentSnapshot}--main--${REPO}--${OWNER}.entmseds.reviews${PATHNAME}`;
 
-  ADMIN_LINK.href = `/tools/snapshot-admin/snapshot-details.html?snapshot=https://main--${REPO}--${OWNER}.aem.page/.snapshots/${currentSnapshot}/.manifest.json`;
+  ADMIN_LINK.href = `/tools/snapshot-admin/snapshot-details.html?snapshot=https://main--${REPO}--${OWNER}.entmseds.page/.snapshots/${currentSnapshot}/.manifest.json`;
 
   // Show/hide appropriate sections
   if (state === 'page') {
@@ -261,7 +261,7 @@ REVIEW_APPROVE.addEventListener('click', async () => {
   await updateReviewStatus(OWNER, REPO, currentSnapshot, 'approve');
   window.parent.location.href = customLiveHost
     ? `https://${customLiveHost}${PATHNAME}`
-    : `https://main--${REPO}--${OWNER}.aem.live${PATHNAME}`;
+    : `https://main--${REPO}--${OWNER}.entmseds.live${PATHNAME}`;
 });
 
 // Initialize

@@ -32,8 +32,8 @@ export default function createSiteCard(site, orgValue, options = {}) {
   card.className = 'site-card';
   card.dataset.site = site.name;
 
-  const previewUrl = `https://main--${site.name}--${orgValue}.aem.page/`;
-  const liveUrl = `https://main--${site.name}--${orgValue}.aem.live/`;
+  const previewUrl = `https://main--${site.name}--${orgValue}.entmseds.page/`;
+  const liveUrl = `https://main--${site.name}--${orgValue}.entmseds.live/`;
   const sourceType = getContentSourceType(null, null, true);
   const favorited = isFavorite(orgValue, site.name);
   if (favorited) card.classList.add('favorited');

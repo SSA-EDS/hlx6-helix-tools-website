@@ -1,10 +1,10 @@
-# tools.aem.live
+# tools.entmseds.live
 
-[tools.aem.live](https://tools.aem.live/), provides administrative and development tools for AEM Edge Delivery Services (EDS).
+[tools.entmseds.live](https://tools.entmseds.live/), provides administrative and development tools for AEM Edge Delivery Services (EDS).
 
 ## Environments
-- Preview: https://main--helix-tools-website--adobe.aem.page/
-- Live: https://main--helix-tools-website--adobe.aem.live/
+- Preview: https://main--helix-tools-website--adobe.entmseds.page/
+- Live: https://main--helix-tools-website--adobe.entmseds.live/
 
 ## Installation
 

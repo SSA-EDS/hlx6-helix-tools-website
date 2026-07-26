@@ -11,9 +11,9 @@
  *   node capture-screenshots.js <after-url> [before-url] [output-dir] [block-selector]
  *
  * Examples:
- *   node capture-screenshots.js https://branch--repo--owner.aem.page/path
- *   node capture-screenshots.js https://branch--repo--owner.aem.page/path https://main--repo--owner.aem.page/path
- *   node capture-screenshots.js https://branch--repo--owner.aem.page/path "" ./my-screenshots ".hero"
+ *   node capture-screenshots.js https://branch--repo--owner.entmseds.page/path
+ *   node capture-screenshots.js https://branch--repo--owner.entmseds.page/path https://main--repo--owner.entmseds.page/path
+ *   node capture-screenshots.js https://branch--repo--owner.entmseds.page/path "" ./my-screenshots ".hero"
  */
 
 import { chromium } from 'playwright';
@@ -159,9 +159,9 @@ async function main() {
     console.log('Usage: node capture-screenshots.js <after-url> [before-url] [output-dir] [block-selector]');
     console.log('');
     console.log('Examples:');
-    console.log('  node capture-screenshots.js https://branch--repo--owner.aem.page/path');
-    console.log('  node capture-screenshots.js https://branch--repo--owner.aem.page/path https://main--repo--owner.aem.page/path');
-    console.log('  node capture-screenshots.js https://branch--repo--owner.aem.page/path "" ./screenshots ".hero"');
+    console.log('  node capture-screenshots.js https://branch--repo--owner.entmseds.page/path');
+    console.log('  node capture-screenshots.js https://branch--repo--owner.entmseds.page/path https://main--repo--owner.entmseds.page/path');
+    console.log('  node capture-screenshots.js https://branch--repo--owner.entmseds.page/path "" ./screenshots ".hero"');
     process.exit(1);
   }
 

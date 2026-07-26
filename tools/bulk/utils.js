@@ -1,7 +1,7 @@
 /**
  * Extract org and site name from an AEM URL hostname.
- * AEM URLs follow the pattern: branch--site--org.aem.page
- * @param {string} url - Full URL (e.g. https://main--mysite--myorg.aem.page/path)
+ * AEM URLs follow the pattern: branch--site--org.entmseds.page
+ * @param {string} url - Full URL (e.g. https://main--mysite--myorg.entmseds.page/path)
  * @returns {{ org: string, site: string }}
  */
 export function extractOrgSite(url) {

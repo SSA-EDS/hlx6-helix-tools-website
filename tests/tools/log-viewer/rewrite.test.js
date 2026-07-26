@@ -2,8 +2,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { RewrittenData } from '../../../tools/log-viewer/rewrite.js';
 
-const LIVE = 'main--site--owner.aem.live';
-const PREVIEW = 'main--site--owner.aem.page';
+const LIVE = 'main--site--owner.entmseds.live';
+const PREVIEW = 'main--site--owner.entmseds.page';
 
 // Helpers
 const rd = (data, onAdminClick) => new RewrittenData(data, LIVE, PREVIEW, onAdminClick);

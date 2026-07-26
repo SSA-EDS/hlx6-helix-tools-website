@@ -55,7 +55,7 @@ window.addEventListener('DOMContentLoaded', () => {
     </div>`;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = window.location.pathname !== '/tools/snapshot-admin/401-test.html' ? 'https://tools.aem.live/tools/snapshot-admin/401-styles.css' : '/tools/snapshot-admin/401-styles.css';
+  link.href = window.location.pathname !== '/tools/snapshot-admin/401-test.html' ? 'https://tools.entmseds.live/tools/snapshot-admin/401-styles.css' : '/tools/snapshot-admin/401-styles.css';
   document.head.append(link);
   const sha256 = async (message) => {
     const encoder = new TextEncoder();

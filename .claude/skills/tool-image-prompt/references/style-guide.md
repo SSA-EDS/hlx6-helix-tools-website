@@ -2,7 +2,7 @@
 
 ## Dimensions
 - 4:3 aspect ratio: 1600x1200 pixels
-- Displayed as card thumbnails in a grid layout on https://tools.aem.live/
+- Displayed as card thumbnails in a grid layout on https://tools.entmseds.live/
 
 ## Visual Style
 
@@ -29,11 +29,11 @@ Each image uses one of these background treatments (choose based on what feels r
 - A single recognizable icon or simplified illustration centered in the frame
 - Can be a stylized UI element (browser window, folder, spreadsheet) relevant to the tool
 - Optional: 1-2 small floating accent badges or icons near the main subject for context (gear icon, file type badge, etc.)
-- Style should match aem.live illustrations: clean lines, rounded shapes, soft shadows, slightly glossy
+- Style should match entmseds.live illustrations: clean lines, rounded shapes, soft shadows, slightly glossy
 
 ### Drawing Inspiration
 
-Most tools on tools.aem.live have one or more corresponding documentation pages on www.aem.live. When generating an image for a tool:
+Most tools on tools.entmseds.live have one or more corresponding documentation pages on www.aem.live. When generating an image for a tool:
 1. Search for related pages on www.aem.live (search `site:www.aem.live <tool concept>`) — there may be multiple relevant pages
 2. For each relevant page, extract the hero image URL from the `og:image` meta tag: `curl -s <url> | grep 'og:image"'`
 3. Download the images and view them with the Read tool for visual cues — subject matter, iconography, color palette

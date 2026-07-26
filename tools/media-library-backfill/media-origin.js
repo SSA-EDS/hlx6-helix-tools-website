@@ -1,7 +1,7 @@
 import { canonicalizeHashedMediaUrl } from './media-identity.js';
 
 export function getSiteAemPageOrigin(org, site, ref = 'main') {
-  return `https://${ref}--${site}--${org}.aem.page`;
+  return `https://${ref}--${site}--${org}.entmseds.page`;
 }
 
 function toUrl(value, base) {
@@ -18,15 +18,15 @@ function getCurrentSiteHosts(siteAemOrigin) {
     return new Set();
   }
 
-  const siteStem = siteAemUrl.hostname.endsWith('.aem.page')
-    ? siteAemUrl.hostname.slice(0, -'.aem.page'.length)
+  const siteStem = siteAemUrl.hostname.endsWith('.entmseds.page')
+    ? siteAemUrl.hostname.slice(0, -'.entmseds.page'.length)
     : '';
 
   return new Set([
     siteAemUrl.hostname,
     ...(siteStem ? [
       `${siteStem}.hlx.page`,
-      `${siteStem}.aem.live`,
+      `${siteStem}.entmseds.live`,
       `${siteStem}.hlx.live`,
     ] : []),
   ]);
@@ -86,11 +86,11 @@ export function normalizeMediaUrlToCurrentSiteAemPage(
     mediaUrl.protocol = siteAemUrl.protocol;
     mediaUrl.host = siteAemUrl.host;
   } else if (mediaUrl.hostname.endsWith('.hlx.page')) {
-    mediaUrl.hostname = mediaUrl.hostname.replace('.hlx.page', '.aem.page');
+    mediaUrl.hostname = mediaUrl.hostname.replace('.hlx.page', '.entmseds.page');
   } else if (mediaUrl.hostname.endsWith('.hlx.live')) {
-    mediaUrl.hostname = mediaUrl.hostname.replace('.hlx.live', '.aem.page');
-  } else if (mediaUrl.hostname.endsWith('.aem.live')) {
-    mediaUrl.hostname = mediaUrl.hostname.replace('.aem.live', '.aem.page');
+    mediaUrl.hostname = mediaUrl.hostname.replace('.hlx.live', '.entmseds.page');
+  } else if (mediaUrl.hostname.endsWith('.entmseds.live')) {
+    mediaUrl.hostname = mediaUrl.hostname.replace('.entmseds.live', '.entmseds.page');
   }
 
   return canonicalizeHashedMediaUrl(mediaUrl.toString());

@@ -1,4 +1,4 @@
-const ADMIN_BASE = 'https://api.aem.live';
+const ADMIN_BASE = 'https://api.entmseds.live';
 
 const CONTENT_TYPES = {
   json: 'application/json',

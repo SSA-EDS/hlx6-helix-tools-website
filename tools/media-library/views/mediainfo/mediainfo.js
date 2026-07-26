@@ -27,8 +27,8 @@ function formatDocPath(doc) {
   return (doc || '').replace(/\.(md|html)$/, '');
 }
 
-const getViewUrl = (org, repo, path) => `https://main--${repo}--${org}.aem.page${formatDocPath(path) || ''}`;
-const getLiveUrl = (org, repo, path) => `https://main--${repo}--${org}.aem.live${formatDocPath(path) || ''}`;
+const getViewUrl = (org, repo, path) => `https://main--${repo}--${org}.entmseds.page${formatDocPath(path) || ''}`;
+const getLiveUrl = (org, repo, path) => `https://main--${repo}--${org}.entmseds.live${formatDocPath(path) || ''}`;
 
 function iconImg(name, className = 'icon') {
   return `<img src="/icons/${name}.svg" class="${escapeAttr(className)}" width="20" height="20" alt="" role="presentation">`;

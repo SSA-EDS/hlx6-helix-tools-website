@@ -33,7 +33,7 @@ describe('site-admin:utils.js', () => {
 
     it('recognizes DA content URL with markup type', () => {
       assert.deepEqual(
-        getContentSourceType('https://content.da.live/org/repo', 'markup'),
+        getContentSourceType('https://content.entmseds-da.live/org/repo', 'markup'),
         { type: 'da', label: 'DA' },
       );
     });
@@ -126,7 +126,7 @@ describe('site-admin:utils.js', () => {
   describe('buildSiteConfig', () => {
     describe('GitHub code source', () => {
       it('extracts owner and repo from a GitHub URL', () => {
-        const result = buildSiteConfig({}, 'https://github.com/my-org/my-repo', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig({}, 'https://github.com/my-org/my-repo', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.code.owner, 'my-org');
         assert.equal(result.code.repo, 'my-repo');
         assert.equal(result.code.source.type, 'github');
@@ -134,7 +134,7 @@ describe('site-admin:utils.js', () => {
       });
 
       it('only uses the first two path segments, ignoring trailing paths', () => {
-        const result = buildSiteConfig({}, 'https://github.com/my-org/my-repo/tree/main', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig({}, 'https://github.com/my-org/my-repo/tree/main', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.code.owner, 'my-org');
         assert.equal(result.code.repo, 'my-repo');
       });
@@ -142,7 +142,7 @@ describe('site-admin:utils.js', () => {
 
     describe('BYOGIT code source', () => {
       it('uses the BYOGIT fixed source config when byogit is provided', () => {
-        const result = buildSiteConfig({}, '', 'https://content.da.live/org/repo', { owner: 'prog-123', repo: 'repo-456' });
+        const result = buildSiteConfig({}, '', 'https://content.entmseds-da.live/org/repo', { owner: 'prog-123', repo: 'repo-456' });
         assert.equal(result.code.owner, 'prog-123');
         assert.equal(result.code.repo, 'repo-456');
         assert.equal(result.code.source.type, 'byogit');
@@ -150,7 +150,7 @@ describe('site-admin:utils.js', () => {
       });
 
       it('does not parse the code URL when byogit is provided', () => {
-        assert.doesNotThrow(() => buildSiteConfig({}, '', 'https://content.da.live/org/repo', { owner: 'o', repo: 'r' }));
+        assert.doesNotThrow(() => buildSiteConfig({}, '', 'https://content.entmseds-da.live/org/repo', { owner: 'o', repo: 'r' }));
       });
     });
 
@@ -167,27 +167,27 @@ describe('site-admin:utils.js', () => {
       });
 
       it('leaves type as markup for generic content URLs', () => {
-        const result = buildSiteConfig({}, 'https://github.com/o/r', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig({}, 'https://github.com/o/r', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.content.source.type, 'markup');
-        assert.equal(result.content.source.url, 'https://content.da.live/org/repo');
+        assert.equal(result.content.source.url, 'https://content.entmseds-da.live/org/repo');
       });
 
       it('does not set source.id for non-Google-Drive URLs', () => {
-        const result = buildSiteConfig({}, 'https://github.com/o/r', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig({}, 'https://github.com/o/r', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.content.source.id, undefined);
       });
     });
 
     describe('existing site config merging', () => {
       it('preserves existing site fields', () => {
-        const result = buildSiteConfig({ name: 'my-site', extra: 'preserved' }, 'https://github.com/o/r', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig({ name: 'my-site', extra: 'preserved' }, 'https://github.com/o/r', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.name, 'my-site');
         assert.equal(result.extra, 'preserved');
       });
 
       it('overwrites code and content with newly built values', () => {
         const existing = { code: { owner: 'old' }, content: { source: { type: 'old' } } };
-        const result = buildSiteConfig(existing, 'https://github.com/new-org/new-repo', 'https://content.da.live/org/repo');
+        const result = buildSiteConfig(existing, 'https://github.com/new-org/new-repo', 'https://content.entmseds-da.live/org/repo');
         assert.equal(result.code.owner, 'new-org');
         assert.equal(result.content.source.type, 'markup');
       });
@@ -203,17 +203,17 @@ describe('site-admin:utils.js', () => {
       assert.equal(getDAEditorURL(''), null);
     });
 
-    it('transforms content.da.live URL to DA editor URL', () => {
+    it('transforms content.entmseds-da.live URL to DA editor URL', () => {
       assert.equal(
-        getDAEditorURL('https://content.da.live/org/repo/path'),
-        'https://da.live/#/org/repo/path',
+        getDAEditorURL('https://content.entmseds-da.live/org/repo/path'),
+        'https://entmseds-da.live/#/org/repo/path',
       );
     });
 
-    it('transforms stage-content.da.live URL to DA editor URL', () => {
+    it('transforms stage-content.entmseds-da.live URL to DA editor URL', () => {
       assert.equal(
-        getDAEditorURL('https://stage-content.da.live/org/repo/path'),
-        'https://da.live/#/org/repo/path',
+        getDAEditorURL('https://stage-content.entmseds-da.live/org/repo/path'),
+        'https://entmseds-da.live/#/org/repo/path',
       );
     });
 

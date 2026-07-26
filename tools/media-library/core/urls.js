@@ -81,12 +81,12 @@ export function parseOrgRepoFromUrl(siteUrl) {
     hostname = url.hostname;
   } catch (error) {
     if (error instanceof TypeError) {
-      throw new Error(`Invalid URL format: ${siteUrl}. Expected format: https://main--site--org.aem.page`);
+      throw new Error(`Invalid URL format: ${siteUrl}. Expected format: https://main--site--org.entmseds.page`);
     }
     throw error;
   }
 
-  const match = hostname.match(/^main--(.+?)--([^.]+)\.aem\.page$/);
+  const match = hostname.match(/^main--(.+?)--([^.]+)\.entmseds\.page$/);
   if (match) {
     const [, repo, org] = match;
     return { org, repo };

@@ -1,11 +1,11 @@
 ---
 name: tool-image-prompt
-description: Generate Adobe Firefly image prompts for AEM tools website (tools.aem.live) tool card thumbnails. Use when creating or updating thumbnail images for tools, or when a new tool needs a card image. Triggers on requests like "create an image for the X tool", "generate a tool thumbnail", "make a Firefly prompt for this tool".
+description: Generate Adobe Firefly image prompts for AEM tools website (tools.entmseds.live) tool card thumbnails. Use when creating or updating thumbnail images for tools, or when a new tool needs a card image. Triggers on requests like "create an image for the X tool", "generate a tool thumbnail", "make a Firefly prompt for this tool".
 ---
 
 # Tool Image Prompt Generator
 
-Generate Adobe Firefly prompts for tool card thumbnail images on https://tools.aem.live/. The workflow is interactive: gather context, propose visual concepts, and output a ready-to-use Firefly prompt.
+Generate Adobe Firefly prompts for tool card thumbnail images on https://tools.entmseds.live/. The workflow is interactive: gather context, propose visual concepts, and output a ready-to-use Firefly prompt.
 
 Read [references/style-guide.md](references/style-guide.md) before starting — it defines the visual style, color system, background treatments, and reference examples from www.aem.live.
 
@@ -51,7 +51,7 @@ Ask the user to choose a **background treatment:**
 
 Propose 3 distinct concepts. Each should:
 - Feature a single clear icon or simplified illustration as the central subject
-- Match the aem.live hero image aesthetic (light, clean, approachable)
+- Match the entmseds.live hero image aesthetic (light, clean, approachable)
 - Specify the subject, any accent badges/icons, and background color direction
 
 Present each as a 1-2 sentence description. Ask the user to pick one or suggest a direction.

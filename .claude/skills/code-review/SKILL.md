@@ -28,7 +28,7 @@ git diff --staged # See staged changes
 ```bash
 cd .claude/skills/code-review/scripts
 npm install
-node capture-screenshots.js https://{branch}--helix-tools-website--adobe.aem.page/{path}
+node capture-screenshots.js https://{branch}--helix-tools-website--adobe.entmseds.page/{path}
 ```
 
 ---
@@ -46,7 +46,7 @@ See **Output Format → PR Review Mode** below for the full process.
 ## Review Criteria
 
 **PR Structure (PR mode only):**
-- Preview URL: `https://{branch}--helix-tools-website--adobe.aem.page/{path}` or `https://{branch}--helix-tools-website--adobe.aem.live/{path}` (both `.aem.page` and `.aem.live` are accepted)
+- Preview URL: `https://{branch}--helix-tools-website--adobe.entmseds.page/{path}` or `https://{branch}--helix-tools-website--adobe.entmseds.live/{path}` (both `.entmseds.page` and `.entmseds.live` are accepted)
 - Clear description of what changed and why
 
 **JavaScript:**

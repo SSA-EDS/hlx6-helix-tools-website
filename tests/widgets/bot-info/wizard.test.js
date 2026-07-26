@@ -22,11 +22,11 @@ describe('bot-info:wizard.js', () => {
     });
 
     it('detects DA', () => {
-      assert.equal(detectContentSourceKind('https://content.da.live/org/site'), 'da');
+      assert.equal(detectContentSourceKind('https://content.entmseds-da.live/org/site'), 'da');
     });
 
-    it('detects AEM (api.aem.live and legacy adobeaemcloud)', () => {
-      assert.equal(detectContentSourceKind('https://api.aem.live/org/sites/site/source'), 'aem');
+    it('detects AEM (api.entmseds.live and legacy adobeaemcloud)', () => {
+      assert.equal(detectContentSourceKind('https://api.entmseds.live/org/sites/site/source'), 'aem');
       assert.equal(detectContentSourceKind('https://author-p123.adobeaemcloud.com/'), 'aem');
     });
 
@@ -38,8 +38,8 @@ describe('bot-info:wizard.js', () => {
   describe('buildContentSource', () => {
     it('builds a markup source for DA', () => {
       assert.deepEqual(
-        buildContentSource('https://content.da.live/org/site', 'da'),
-        { type: 'markup', url: 'https://content.da.live/org/site' },
+        buildContentSource('https://content.entmseds-da.live/org/site', 'da'),
+        { type: 'markup', url: 'https://content.entmseds-da.live/org/site' },
       );
     });
 
@@ -76,10 +76,10 @@ describe('bot-info:wizard.js', () => {
     });
 
     it('never sets a suffix for DA, SharePoint, Google Drive or AEM', () => {
-      assert.equal(buildContentSource('https://content.da.live/o/s', 'da', '.html').suffix, undefined);
+      assert.equal(buildContentSource('https://content.entmseds-da.live/o/s', 'da', '.html').suffix, undefined);
       assert.equal(buildContentSource('https://x.sharepoint.com', 'onedrive', '.html').suffix, undefined);
       assert.equal(buildContentSource('https://drive.google.com/drive/folders/x', 'google', '.html').suffix, undefined);
-      assert.equal(buildContentSource('https://api.aem.live/o/sites/s/source', 'aem', '.html').suffix, undefined);
+      assert.equal(buildContentSource('https://api.entmseds.live/o/sites/s/source', 'aem', '.html').suffix, undefined);
     });
 
     it('omits the suffix when none is provided', () => {

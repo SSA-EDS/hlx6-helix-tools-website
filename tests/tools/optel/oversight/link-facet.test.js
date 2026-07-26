@@ -89,9 +89,9 @@ describe('optel/oversight: thumbnail helpers', () => {
   });
 
   it('skips thumbnails when the 404 checkpoint is active', () => {
-    assert.equal(is404CheckpointActive({ href: 'https://tools.aem.live/tools/optel/oversight/explorer.html?checkpoint=404' }), true);
-    assert.equal(is404CheckpointActive({ href: 'https://tools.aem.live/tools/optel/oversight/explorer.html?checkpoint=enter&checkpoint=404' }), true);
-    assert.equal(is404CheckpointActive({ href: 'https://tools.aem.live/tools/optel/oversight/explorer.html?checkpoint=enter' }), false);
+    assert.equal(is404CheckpointActive({ href: 'https://tools.entmseds.live/tools/optel/oversight/explorer.html?checkpoint=404' }), true);
+    assert.equal(is404CheckpointActive({ href: 'https://tools.entmseds.live/tools/optel/oversight/explorer.html?checkpoint=enter&checkpoint=404' }), true);
+    assert.equal(is404CheckpointActive({ href: 'https://tools.entmseds.live/tools/optel/oversight/explorer.html?checkpoint=enter' }), false);
   });
 
   it('appends an image only after a successful probe', () => {

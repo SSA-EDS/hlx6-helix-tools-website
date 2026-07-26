@@ -13,7 +13,7 @@ The tool ships two entry points in the same folder:
 
 ## Management UI
 
-1. Open `https://tools.aem.live/tools/scheduler/`.
+1. Open `https://tools.entmseds.live/tools/scheduler/`.
 2. Enter the **Organization** and **Site** and click **Load schedule**.
 3. If the site is not yet enabled for scheduling, the status panel asks
    you to contact your admin — site registration is handled out-of-band
@@ -36,7 +36,7 @@ this entry to `/{org}/sites/{site}/sidekick.json` under `plugins`:
   "id": "schedule-publish",
   "title": "Schedule Publish",
   "environments": ["edit", "preview", "prod"],
-  "url": "https://tools.aem.live/tools/scheduler/schedule.html",
+  "url": "https://tools.entmseds.live/tools/scheduler/schedule.html",
   "isPopover": true,
   "popoverRect": "width: 480px; height: 360px",
   "passReferrer": true,
@@ -48,7 +48,7 @@ this entry to `/{org}/sites/{site}/sidekick.json` under `plugins`:
 `passReferrer` injects the current page URL — the popover uses
 `owner`/`repo` as `org`/`site`. For the page path, Sidekick's `referrer` is
 just `window.location.href` of the tab the plugin was opened from. On the
-default `.aem.page`/`.aem.live`/`.aem.reviews` hosts that's the page itself,
+default `.entmseds.page`/`.entmseds.live`/`.entmseds.reviews` hosts that's the page itself,
 so its URL pathname is the resource path. On any other host — SharePoint,
 Google Docs, etc. — the tab isn't guaranteed to be the
 page, so the popover instead resolves the path via the Admin API's
@@ -61,7 +61,7 @@ be enabled for scheduling for the popover to schedule successfully.
 The scheduler tool and popover both rely on the AEM Sidekick extension
 to inject the access token on outbound requests; the tool itself sets no
 `Authorization` header. Without the Sidekick installed and signed in,
-calls to `admin.hlx.page` and the scheduler worker will fail with 401.
+calls to `admin.entmseds.page` and the scheduler worker will fail with 401.
 
 ## Files
 

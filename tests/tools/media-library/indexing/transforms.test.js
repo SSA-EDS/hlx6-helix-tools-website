@@ -51,7 +51,7 @@ describe('processAuditLog', () => {
     }];
     const [item] = processAuditLog(entries, 'myorg', 'mysite');
     assert.equal(item.contentType, 'application/pdf');
-    assert.equal(item.url, 'https://main--mysite--myorg.aem.page/docs/report.pdf');
+    assert.equal(item.url, 'https://main--mysite--myorg.entmseds.page/docs/report.pdf');
     assert.equal(item.name, 'report.pdf');
     assert.equal(item.operation, 'ingest');
   });
@@ -155,8 +155,8 @@ describe('detectMediaType', () => {
 // ─── mergeEntriesIntoMediaMap ─────────────────────────────────────────────────
 
 describe('mergeEntriesIntoMediaMap', () => {
-  const URL_A = 'https://main--site--org.aem.page/media/img.jpg';
-  const URL_B = 'https://main--site--org.aem.page/media/other.jpg';
+  const URL_A = 'https://main--site--org.entmseds.page/media/img.jpg';
+  const URL_B = 'https://main--site--org.entmseds.page/media/other.jpg';
 
   it('returns [] for empty entries', () => {
     assert.deepEqual(mergeEntriesIntoMediaMap([], new Map()), []);
@@ -283,7 +283,7 @@ describe('mergeEntriesIntoMediaMap', () => {
 // ─── transformToMediaData ─────────────────────────────────────────────────────
 
 describe('transformToMediaData', () => {
-  const URL_A = 'https://main--site--org.aem.page/media/img.jpg';
+  const URL_A = 'https://main--site--org.entmseds.page/media/img.jpg';
 
   it('returns [] for empty inputs', () => {
     assert.deepEqual(transformToMediaData([], []), []);

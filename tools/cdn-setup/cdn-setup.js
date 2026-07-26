@@ -23,7 +23,7 @@ let admin;
 let originalConfig;
 let validationPassed = false;
 
-const VALIDATION_URL = 'https://admin.hlx.page/hook/byocdn-push-invalidation/';
+const VALIDATION_URL = 'https://admin.entmseds.page/hook/byocdn-push-invalidation/';
 
 const CDN_FIELDS = {
   fastly: [

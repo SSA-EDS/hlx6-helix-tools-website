@@ -34,32 +34,32 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('site-scoped URL is /config/{org}/sites/{site}.json', () => {
       assert.equal(
         admin.config({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/config/adobe/sites/x.json',
+        'https://admin.entmseds.page/config/adobe/sites/x.json',
       );
     });
 
     it('org-only URL is /config/{org}.json', () => {
       assert.equal(
         admin.config({ org: 'adobe' }).url,
-        'https://admin.hlx.page/config/adobe.json',
+        'https://admin.entmseds.page/config/adobe.json',
       );
     });
 
     it('profile-scoped URL is /config/{org}/profiles/{profile}.json', () => {
       assert.equal(
         admin.config({ org: 'adobe', profile: 'p' }).url,
-        'https://admin.hlx.page/config/adobe/profiles/p.json',
+        'https://admin.entmseds.page/config/adobe/profiles/p.json',
       );
     });
 
     it('select from site root descends into /config/{org}/sites/{site}/', async () => {
       await admin.config({ org: 'adobe', site: 'x' }).select('robots.txt').read();
-      assert.equal(calls[0].url, 'https://admin.hlx.page/config/adobe/sites/x/robots.txt');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/config/adobe/sites/x/robots.txt');
     });
 
     it('select from org root descends into /config/{org}/', async () => {
       await admin.config({ org: 'adobe' }).select('aggregated/x.json').read();
-      assert.equal(calls[0].url, 'https://admin.hlx.page/config/adobe/aggregated/x.json');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/config/adobe/aggregated/x.json');
     });
 
     it('config({org, site}) ≡ config({org}).select(`sites/{site}.json`)', async () => {
@@ -76,12 +76,12 @@ describe('helix-admin.js — H5 URL contract', () => {
 
     it('.read() at the site root hits /config/{org}/sites/{site}.json', async () => {
       await admin.config({ org: 'adobe', site: 'x' }).read();
-      assert.equal(calls[0].url, 'https://admin.hlx.page/config/adobe/sites/x.json');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/config/adobe/sites/x.json');
     });
 
     it('.remove() hits the bound URL', async () => {
       await admin.config({ org: 'adobe', site: 'x' }).select('headers.json').remove();
-      assert.equal(calls[0].url, 'https://admin.hlx.page/config/adobe/sites/x/headers.json');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/config/adobe/sites/x/headers.json');
     });
   });
 
@@ -89,29 +89,29 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /status/{org}/{site}/main', () => {
       assert.equal(
         admin.status({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/status/adobe/x/main',
+        'https://admin.entmseds.page/status/adobe/x/main',
       );
     });
 
     it('.get(path) appends to the base URL', async () => {
       await admin.status({ org: 'adobe', site: 'x' }).get('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/status/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/status/adobe/x/main/en/index');
     });
 
     it('.get(path, { params }) appends query string', async () => {
       await admin.status({ org: 'adobe', site: 'x' }).get('/page', { params: { editUrl: 'auto' } });
-      assert.equal(calls[0].url, 'https://admin.hlx.page/status/adobe/x/main/page?editUrl=auto');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/status/adobe/x/main/page?editUrl=auto');
     });
 
     it('.update(path) POSTs a trigger', async () => {
       await admin.status({ org: 'adobe', site: 'x' }).update('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/status/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/status/adobe/x/main/en/index');
       assert.equal(calls[0].init.method, 'POST');
     });
 
     it('ref: null omits the /main segment', async () => {
       await admin.status({ org: 'adobe', site: 'x', ref: null }).get('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/status/adobe/x');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/status/adobe/x');
     });
   });
 
@@ -119,23 +119,23 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /preview/{org}/{site}/main', () => {
       assert.equal(
         admin.preview({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/preview/adobe/x/main',
+        'https://admin.entmseds.page/preview/adobe/x/main',
       );
     });
 
     it('.get(path) GETs the preview status', async () => {
       await admin.preview({ org: 'adobe', site: 'x' }).get('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/preview/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/preview/adobe/x/main/en/index');
     });
 
     it('.update(path) POSTs a bodyless trigger', async () => {
       await admin.preview({ org: 'adobe', site: 'x' }).update('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/preview/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/preview/adobe/x/main/en/index');
     });
 
     it('.remove(path) DELETEs the preview', async () => {
       await admin.preview({ org: 'adobe', site: 'x' }).remove('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/preview/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/preview/adobe/x/main/en/index');
     });
   });
 
@@ -143,13 +143,13 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /live/{org}/{site}/main', () => {
       assert.equal(
         admin.live({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/live/adobe/x/main',
+        'https://admin.entmseds.page/live/adobe/x/main',
       );
     });
 
     it('.get/.update/.remove hit /live/{org}/{site}/main/{path}', async () => {
       await admin.live({ org: 'adobe', site: 'x' }).get('/en/index');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/live/adobe/x/main/en/index');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/live/adobe/x/main/en/index');
     });
   });
 
@@ -157,46 +157,46 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /code/{org}/{site}/main', () => {
       assert.equal(
         admin.code({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/code/adobe/x/main',
+        'https://admin.entmseds.page/code/adobe/x/main',
       );
     });
 
     it('.get/.update/.remove hit /code/{org}/{site}/main/{path}', async () => {
       await admin.code({ org: 'adobe', site: 'x' }).get('/scripts/scripts.js');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/code/adobe/x/main/scripts/scripts.js');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/code/adobe/x/main/scripts/scripts.js');
     });
   });
 
   describe('admin.snapshot(coords)', () => {
     it('.get("") GETs the snapshot list', async () => {
       await admin.snapshot({ org: 'adobe', site: 'x' }).get('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/snapshot/adobe/x/main');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/snapshot/adobe/x/main');
       assert.equal(calls[0].init.method, 'GET');
     });
 
     it('.get("name") GETs the named snapshot manifest', async () => {
       await admin.snapshot({ org: 'adobe', site: 'x' }).get('my-snapshot');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/snapshot/adobe/x/main/my-snapshot');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/snapshot/adobe/x/main/my-snapshot');
       assert.equal(calls[0].init.method, 'GET');
     });
 
     it('.update("name", body) POSTs to the snapshot endpoint', async () => {
       await admin.snapshot({ org: 'adobe', site: 'x' }).update('my-snapshot', '{"review":"approved"}');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/snapshot/adobe/x/main/my-snapshot');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/snapshot/adobe/x/main/my-snapshot');
       assert.equal(calls[0].init.method, 'POST');
       assert.equal(calls[0].init.body, '{"review":"approved"}');
     });
 
     it('.remove("name/*") DELETEs snapshot paths', async () => {
       await admin.snapshot({ org: 'adobe', site: 'x' }).remove('my-snapshot/*');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/snapshot/adobe/x/main/my-snapshot/*');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/snapshot/adobe/x/main/my-snapshot/*');
       assert.equal(calls[0].init.method, 'DELETE');
     });
 
     it('exposes .url equal to the base operation URL', () => {
       assert.equal(
         admin.snapshot({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/snapshot/adobe/x/main',
+        'https://admin.entmseds.page/snapshot/adobe/x/main',
       );
     });
   });
@@ -205,21 +205,21 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /psi/{org}/{site}/main', () => {
       assert.equal(
         admin.psi({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/psi/adobe/x/main',
+        'https://admin.entmseds.page/psi/adobe/x/main',
       );
     });
 
     it('.get() GETs the psi endpoint', async () => {
       await admin.psi({ org: 'adobe', site: 'x' }).get('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/psi/adobe/x/main');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/psi/adobe/x/main');
       assert.equal(calls[0].init.method, 'GET');
     });
 
     it('.get("", { params }) appends query params', async () => {
       await admin.psi({ org: 'adobe', site: 'x' })
-        .get('', { params: { url: 'https://main--x--adobe.aem.live/' } });
+        .get('', { params: { url: 'https://main--x--ssa-eds.entmseds.live/' } });
       const u = new URL(calls[0].url);
-      assert.equal(u.searchParams.get('url'), 'https://main--x--adobe.aem.live/');
+      assert.equal(u.searchParams.get('url'), 'https://main--x--ssa-eds.entmseds.live/');
     });
   });
 
@@ -227,7 +227,7 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.url is /log/{org}/{site}/main', () => {
       assert.equal(
         admin.log({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/log/adobe/x/main',
+        'https://admin.entmseds.page/log/adobe/x/main',
       );
     });
   });
@@ -235,7 +235,7 @@ describe('helix-admin.js — H5 URL contract', () => {
   describe('admin.sidekick(coords)', () => {
     it('.get("config.json") GETs the sidekick config', async () => {
       await admin.sidekick({ org: 'adobe', site: 'x' }).get('config.json');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/sidekick/adobe/x/main/config.json');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/sidekick/adobe/x/main/config.json');
       assert.equal(calls[0].init.method, 'GET');
     });
 
@@ -248,7 +248,7 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('exposes .url equal to the base operation URL', () => {
       assert.equal(
         admin.sidekick({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/sidekick/adobe/x/main',
+        'https://admin.entmseds.page/sidekick/adobe/x/main',
       );
     });
   });
@@ -256,13 +256,13 @@ describe('helix-admin.js — H5 URL contract', () => {
   describe('admin.log(coords)', () => {
     it('.get(path) GETs logs', async () => {
       await admin.log({ org: 'adobe', site: 'x' }).get('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/log/adobe/x/main');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/log/adobe/x/main');
       assert.equal(calls[0].init.method, 'GET');
     });
 
     it('.update(path) POSTs a log update', async () => {
       await admin.log({ org: 'adobe', site: 'x' }).update('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/log/adobe/x/main');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/log/adobe/x/main');
       assert.equal(calls[0].init.method, 'POST');
     });
 
@@ -274,7 +274,7 @@ describe('helix-admin.js — H5 URL contract', () => {
   describe('admin.medialog(coords)', () => {
     it('.get("") GETs the medialog endpoint', async () => {
       await admin.medialog({ org: 'adobe', site: 'x' }).get('');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/medialog/adobe/x/main');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/medialog/adobe/x/main');
       assert.equal(calls[0].init.method, 'GET');
     });
 
@@ -293,7 +293,7 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('exposes .url equal to the base operation URL', () => {
       assert.equal(
         admin.medialog({ org: 'adobe', site: 'x' }).url,
-        'https://admin.hlx.page/medialog/adobe/x/main',
+        'https://admin.entmseds.page/medialog/adobe/x/main',
       );
     });
   });
@@ -302,40 +302,40 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('.update("/*", body) POSTs application/json to the bulk index endpoint', async () => {
       const payload = { paths: ['/'], indexNames: ['default'] };
       await admin.index({ org: 'adobe', site: 'x' }).update('/*', JSON.stringify(payload));
-      assert.equal(calls[0].url, 'https://admin.hlx.page/index/adobe/x/main/*');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/index/adobe/x/main/*');
     });
   });
 
   describe('admin.sitemap(coords) URLs', () => {
     it('.update("/sitemap.xml") hits /sitemap/{org}/{site}/main/sitemap.xml', async () => {
       await admin.sitemap({ org: 'adobe', site: 'x' }).update('/sitemap.xml');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/sitemap/adobe/x/main/sitemap.xml');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/sitemap/adobe/x/main/sitemap.xml');
     });
   });
 
   describe('admin.job(coords) URLs', () => {
     it('.get("topic/name") hits /job/{org}/{site}/main/topic/name', async () => {
       await admin.job({ org: 'adobe', site: 'x' }).get('index/job-123');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/job/adobe/x/main/index/job-123');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/job/adobe/x/main/index/job-123');
     });
   });
 
   describe('admin.raw() H5 URLs', () => {
-    it('/path resolves against https://admin.hlx.page', async () => {
+    it('/path resolves against https://admin.entmseds.page', async () => {
       await admin.raw('GET', '/sidekick/adobe/x/main/config.json');
-      assert.equal(calls[0].url, 'https://admin.hlx.page/sidekick/adobe/x/main/config.json');
+      assert.equal(calls[0].url, 'https://admin.entmseds.page/sidekick/adobe/x/main/config.json');
     });
   });
 
   describe('admin.suggestions(coords) H5 URLs', () => {
     it('org-only includes /config/{org}.json', () => {
       const items = admin.suggestions({ org: 'adobe' });
-      assert.ok(items.some(({ url }) => url === 'https://admin.hlx.page/config/adobe.json'));
+      assert.ok(items.some(({ url }) => url === 'https://admin.entmseds.page/config/adobe.json'));
     });
 
     it('with site includes /config/{org}/sites/{site}.json', () => {
       const items = admin.suggestions({ org: 'adobe', site: 'x' });
-      assert.ok(items.some(({ url }) => url === 'https://admin.hlx.page/config/adobe/sites/x.json'));
+      assert.ok(items.some(({ url }) => url === 'https://admin.entmseds.page/config/adobe/sites/x.json'));
     });
 
     it('with site includes status and preview URLs', () => {
@@ -353,42 +353,42 @@ describe('helix-admin.js — H5 URL contract', () => {
   describe('admin.coordsFromURL(url) H5 patterns', () => {
     it('parses org from /config/{org}.json', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/config/adobe.json'),
+        admin.coordsFromURL('https://admin.entmseds.page/config/adobe.json'),
         { org: 'adobe', site: null },
       );
     });
 
     it('treats /config/{org}/sites.json as org-only (sites list, not a specific site)', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/config/adobe/sites.json'),
+        admin.coordsFromURL('https://admin.entmseds.page/config/adobe/sites.json'),
         { org: 'adobe', site: null },
       );
     });
 
     it('parses org + site from /config/{org}/sites/{site}.json', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/config/adobe/sites/x.json'),
+        admin.coordsFromURL('https://admin.entmseds.page/config/adobe/sites/x.json'),
         { org: 'adobe', site: 'x' },
       );
     });
 
     it('parses org + site from a site sub-resource config URL', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/config/adobe/sites/x/cdn.json'),
+        admin.coordsFromURL('https://admin.entmseds.page/config/adobe/sites/x/cdn.json'),
         { org: 'adobe', site: 'x' },
       );
     });
 
     it('parses org + site from an operation URL', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/status/adobe/x/main'),
+        admin.coordsFromURL('https://admin.entmseds.page/status/adobe/x/main'),
         { org: 'adobe', site: 'x' },
       );
     });
 
     it('parses org + site from a preview URL with content path', () => {
       assert.deepEqual(
-        admin.coordsFromURL('https://admin.hlx.page/preview/adobe/x/main/en/index'),
+        admin.coordsFromURL('https://admin.entmseds.page/preview/adobe/x/main/en/index'),
         { org: 'adobe', site: 'x' },
       );
     });
@@ -396,7 +396,7 @@ describe('helix-admin.js — H5 URL contract', () => {
     it('derived client coordsFromURL parses correctly', () => {
       const a = admin.withRequestInit({ credentials: 'include' });
       assert.deepEqual(
-        a.coordsFromURL('https://admin.hlx.page/config/adobe/sites/x.json'),
+        a.coordsFromURL('https://admin.entmseds.page/config/adobe/sites/x.json'),
         { org: 'adobe', site: 'x' },
       );
     });

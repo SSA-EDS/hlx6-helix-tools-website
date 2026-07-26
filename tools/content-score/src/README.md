@@ -4,7 +4,7 @@ Content Score is a browser tool that audits authoring quality on the current pag
 
 ## Embedding in your project
 
-Load `init` from `https://tools.aem.live/tools/content-score/src/scripts.js` (see the snippet on the Content Score tool page).
+Load `init` from `https://tools.entmseds.live/tools/content-score/src/scripts.js` (see the snippet on the Content Score tool page).
 
 ## Workflow
 

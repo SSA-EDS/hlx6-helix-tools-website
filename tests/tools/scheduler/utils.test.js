@@ -62,9 +62,9 @@ describe('scheduler:utils.js', () => {
 
   describe('isPageHost', () => {
     it('matches the default preview/live/review hosts', () => {
-      assert.equal(isPageHost('main--site--org.aem.page'), true);
-      assert.equal(isPageHost('main--site--org.aem.live'), true);
-      assert.equal(isPageHost('default--main--site--org.aem.reviews'), true);
+      assert.equal(isPageHost('main--site--org.entmseds.page'), true);
+      assert.equal(isPageHost('main--site--org.entmseds.live'), true);
+      assert.equal(isPageHost('default--main--site--org.entmseds.reviews'), true);
     });
 
     it('rejects anything else, including authoring surfaces and a custom prod domain', () => {
@@ -76,13 +76,13 @@ describe('scheduler:utils.js', () => {
 
   describe('parseSidekickParams', () => {
     it('derives path directly from a preview/live referrer', () => {
-      const search = '?owner=org&repo=site&referrer=https%3A%2F%2Fmain--site--org.aem.page%2Ffoo%2Fbar';
+      const search = '?owner=org&repo=site&referrer=https%3A%2F%2Fmain--site--org.entmseds.page%2Ffoo%2Fbar';
       const result = parseSidekickParams(search);
       assert.deepEqual(result, {
         org: 'org',
         site: 'site',
         path: '/foo/bar',
-        referrer: 'https://main--site--org.aem.page/foo/bar',
+        referrer: 'https://main--site--org.entmseds.page/foo/bar',
         isProject: true,
       });
     });

@@ -45,8 +45,8 @@ async function init() {
     }
   } catch { /* use defaults */ }
 
-  REVIEWS_LINK.href = customReviewHost ? `https://${customReviewHost}${PATHNAME}` : `https://${SNAPSHOT}--main--${REPO}--${OWNER}.aem.reviews${PATHNAME}`;
-  ADMIN_LINK.href = `/tools/snapshot-admin/index.html?snapshot=https://main--${REPO}--${OWNER}.aem.page/.snapshots/${SNAPSHOT}/.manifest.json`;
+  REVIEWS_LINK.href = customReviewHost ? `https://${customReviewHost}${PATHNAME}` : `https://${SNAPSHOT}--main--${REPO}--${OWNER}.entmseds.reviews${PATHNAME}`;
+  ADMIN_LINK.href = `/tools/snapshot-admin/index.html?snapshot=https://main--${REPO}--${OWNER}.entmseds.page/.snapshots/${SNAPSHOT}/.manifest.json`;
 
   if (state === 'page') {
     PAGE_STATUS_WRAPPER.setAttribute('aria-hidden', 'false');
@@ -155,7 +155,7 @@ REVIEW_REJECT.addEventListener('click', async () => {
 REVIEW_APPROVE.addEventListener('click', async () => {
   SPINNER.setAttribute('aria-hidden', 'false');
   await updateReviewStatus(OWNER, REPO, SNAPSHOT, 'approve');
-  window.parent.location.href = customLiveHost ? `https://${customLiveHost}${PATHNAME}` : `https://main--${REPO}--${OWNER}.aem.live${PATHNAME}`;
+  window.parent.location.href = customLiveHost ? `https://${customLiveHost}${PATHNAME}` : `https://main--${REPO}--${OWNER}.entmseds.live${PATHNAME}`;
 });
 
 init();

@@ -81,7 +81,7 @@ function updateTableError(table, errCode) {
       case 403:
         return {
           title: 'Forbidden',
-          msg: 'Unable to display results. Access to this content was denied. If the site is protected, you need to add <code>tools.aem.live</code> to the site\'s <code>sidekick.trustedHosts</code>. See the <a href="https://www.aem.live/developer/sidekick-development" target="_blank" rel="noopener noreferrer">sidekick development docs</a> for more information.',
+          msg: 'Unable to display results. Access to this content was denied. If the site is protected, you need to add <code>tools.entmseds.live</code> to the site\'s <code>sidekick.trustedHosts</code>. See the <a href="https://www.aem.live/developer/sidekick-development" target="_blank" rel="noopener noreferrer">sidekick development docs</a> for more information.',
         };
       case 404:
         return {
@@ -91,7 +91,7 @@ function updateTableError(table, errCode) {
       case 499:
         return {
           title: 'Initial Fetch Failed',
-          msg: 'This is likely due to CORS. Either use a CORS allow plugin or add a header <code>Access-Control-Allow-Origin: https://tools.aem.live</code> in your site config.',
+          msg: 'This is likely due to CORS. Either use a CORS allow plugin or add a header <code>Access-Control-Allow-Origin: https://tools.entmseds.live</code> in your site config.',
         };
       default:
         return {
