@@ -10,11 +10,21 @@ name: hlx6-ca-central-1 - Manual Code Sync via Webhook
 # bot's own sync-scope logic (push-handler.js: full sync on "created", changed-files-only
 # otherwise) for free.
 #
-# Tradeoff (documented, not accidental): because this runs the bot's own code path, the
-# resulting GitHub Deployment record is indistinguishable from a real bot-triggered sync
-# (creator: helix-eds-ca[bot]). This workflow's own run history (who dispatched it, with
-# what inputs, and any required-reviewer approval) is the audit trail for this mechanism -
-# not the Deployments API.
+# Changed-files detection: compares the target sha against the sha of the most recent
+# "main"-environment GitHub Deployment (the last time ANYTHING - bot or this workflow -
+# actually synced), via `git diff --name-status`, and classifies each path as added /
+# modified / removed to match what push-handler.js's commitsToChanges() expects (so a
+# deleted file is correctly removed from the code bus, not re-fetched from GitHub and
+# 404ing). Falls back to a full sync if no prior deployment exists. The `files` input
+# is a manual override - leave it blank to auto-detect.
+#
+# Audit trail: because a real push and this workflow both run the bot's own code path,
+# the "main"-environment deployment they produce looks identical either way (creator:
+# helix-eds-ca[bot]). BUT GitHub Actions automatically creates a SECOND deployment for
+# this workflow's OWN `environment: hlx6-ca-central-1` on every run (success or failure),
+# tagged with the actual triggering user and a link to the run - only this workflow
+# produces that second entry, so its presence/absence is what distinguishes "this
+# workflow ran" from "a real push happened."
 #
 # Manually tested and confirmed working end-to-end before this file was written.
 # See: https://wiki.corp.adobe.com/spaces/MSTeam/pages/3990094266
@@ -30,7 +40,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Sync mode"
+        description: "Sync mode (changed-files auto-detects since the last sync unless 'files' is set; full forces a recursive sync)"
         required: true
         type: choice
         options:
@@ -38,9 +48,9 @@ on:
           - full
         default: changed-files
       files:
-        description: "Space-separated file paths to sync (only used when mode = changed-files)"
+        description: "Space-separated file paths to sync (optional override; leave blank to auto-detect changed files since the last sync)"
         required: false
-        default: "scripts/scripts.js"
+        default: ""
       sha:
         description: "Commit sha to sync (defaults to current main HEAD if left blank)"
         required: false
@@ -63,25 +73,130 @@ jobs:
                                       # one secret: GH_APP_WEBHOOK_SECRET (and, recommended,
                                       # required reviewers).
     steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.sha != '' && inputs.sha || 'main' }}
+
       - name: Determine target sha
         id: target
         run: |
-          if [ -n "${{ inputs.sha }}" ]; then
-            SHA="${{ inputs.sha }}"
-          else
-            SHA=$(curl -s "https://api.github.com/repos/$OWNER/$REPO/commits/$REF" | jq -r .sha)
-          fi
+          SHA=$(git rev-parse HEAD)
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "Requested by: ${{ github.actor }}"
           echo "Mode: ${{ inputs.mode }}"
           echo "Target sha: $SHA"
 
+      - name: Determine files to sync
+        id: changed
+        env:
+          MODE: ${{ inputs.mode }}
+          FILES_INPUT: ${{ inputs.files }}
+          TARGET_SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, subprocess, urllib.request
+
+          owner = os.environ["OWNER"]
+          repo = os.environ["REPO"]
+          mode = os.environ["MODE"]
+          files_input = os.environ["FILES_INPUT"].split()
+          target_sha = os.environ["TARGET_SHA"]
+
+          def emit(mode_out, no_changes, added=None, modified=None, removed=None, note=""):
+              with open("changed_files.json", "w") as f:
+                  json.dump({
+                      "added": added or [],
+                      "modified": modified or [],
+                      "removed": removed or [],
+                  }, f)
+              gh_out = os.environ["GITHUB_OUTPUT"]
+              with open(gh_out, "a") as f:
+                  f.write(f"mode={mode_out}\n")
+                  f.write(f"no_changes={'true' if no_changes else 'false'}\n")
+              if note:
+                  print(note)
+
+          # 1) Manual override always wins.
+          if files_input:
+              print(f"Using manually specified files: {files_input}")
+              emit(mode, False, modified=files_input)
+              raise SystemExit(0)
+
+          # 2) Explicit full-sync request.
+          if mode == "full":
+              print("Mode explicitly set to full sync.")
+              emit("full", False)
+              raise SystemExit(0)
+
+          # 3) Auto-detect: diff against the last actual sync (most recent "main"-environment deployment).
+          url = f"https://api.github.com/repos/{owner}/{repo}/deployments?environment=main&per_page=1"
+          with urllib.request.urlopen(url) as resp:
+              deployments = json.load(resp)
+
+          if not deployments:
+              print("No prior deployment found for environment 'main' - falling back to full sync.")
+              emit("full", False)
+              raise SystemExit(0)
+
+          last_sha = deployments[0]["sha"]
+          print(f"Last synced sha: {last_sha}")
+          print(f"Target sha:      {target_sha}")
+
+          if last_sha == target_sha:
+              print("Target sha matches the last synced sha - nothing to do.")
+              emit("changed-files", True)
+              raise SystemExit(0)
+
+          diff = subprocess.run(
+              ["git", "diff", "--name-status", last_sha, target_sha],
+              capture_output=True, text=True, check=True,
+          ).stdout
+
+          added, modified, removed = [], [], []
+          for line in diff.splitlines():
+              if not line.strip():
+                  continue
+              parts = line.split("\t")
+              status, paths = parts[0], parts[1:]
+              if status.startswith("A"):
+                  added.append(paths[0])
+              elif status.startswith("M"):
+                  modified.append(paths[0])
+              elif status.startswith("D"):
+                  removed.append(paths[0])
+              elif status.startswith("R"):
+                  # rename: old path removed, new path added
+                  removed.append(paths[0])
+                  added.append(paths[1])
+              else:
+                  # anything unrecognized (e.g. copies, type changes): treat as modified
+                  modified.append(paths[-1])
+
+          if not (added or modified or removed):
+              print(f"No file changes detected between {last_sha} and {target_sha}.")
+              emit("changed-files", True)
+              raise SystemExit(0)
+
+          print(f"Changed files since last sync ({last_sha} -> {target_sha}):")
+          print(f"  added:    {added}")
+          print(f"  modified: {modified}")
+          print(f"  removed:  {removed}")
+          emit("changed-files", False, added=added, modified=modified, removed=removed)
+          PYEOF
+
+      - name: Report no changes
+        if: steps.changed.outputs.no_changes == 'true'
+        run: |
+          echo "Nothing to sync - target sha matches the last synced state, or no relevant file changes were found since then."
+
       - name: Build payload and compute signature
+        if: steps.changed.outputs.no_changes != 'true'
         env:
           GH_APP_WEBHOOK_SECRET: ${{ secrets.GH_APP_WEBHOOK_SECRET }}
           SHA: ${{ steps.target.outputs.sha }}
-          MODE: ${{ inputs.mode }}
-          FILES: ${{ inputs.files }}
+          MODE: ${{ steps.changed.outputs.mode }}
         run: |
           python3 - <<'PYEOF'
           import os, json, hmac, hashlib, datetime, uuid
@@ -92,17 +207,21 @@ jobs:
           sha = os.environ["SHA"]
           installation_id = int(os.environ["INSTALLATION_ID"])
           mode = os.environ["MODE"]
-          files = os.environ["FILES"].split()
           secret = os.environ["GH_APP_WEBHOOK_SECRET"].encode("utf-8")
 
           timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
           is_full = (mode == "full")
 
+          with open("changed_files.json") as f:
+              changes = json.load(f)
+
           # Mirrors push-handler.js: created=true => full recursive sync ('*'),
-          # otherwise the commits[].modified list drives a changed-files-only sync.
+          # otherwise the commits[] added/modified/removed lists drive a targeted sync.
           commits = [] if is_full else [{
               "id": sha, "timestamp": timestamp,
-              "added": [], "removed": [], "modified": files,
+              "added": changes["added"],
+              "removed": changes["removed"],
+              "modified": changes["modified"],
           }]
 
           payload = {
@@ -139,6 +258,7 @@ jobs:
           PYEOF
 
       - name: Send simulated push webhook
+        if: steps.changed.outputs.no_changes != 'true'
         run: |
           SIGNATURE=$(cat signature.txt)
           DELIVERY_ID=$(cat delivery_id.txt)
@@ -160,11 +280,12 @@ jobs:
           echo "Webhook accepted ($HTTP_CODE)"
 
       - name: Cross-check GitHub deployments (confirms the sync actually ran)
-        if: always()
+        if: always() && steps.changed.outputs.no_changes != 'true'
         run: |
           sleep 3
-          echo "Note: entries below are indistinguishable from real bot-triggered syncs"
-          echo "(creator will show helix-eds-ca[bot] either way) - this run's own log above"
-          echo "is the actual audit trail for who triggered THIS sync."
-          curl -s "https://api.github.com/repos/$OWNER/$REPO/deployments?per_page=3" \
-            | jq -r '.[] | "created=\(.created_at)  creator=\(.creator.login)  sha=\(.sha[0:10])"'
+          echo "Note: the 'main'-environment entry below is indistinguishable from a real"
+          echo "bot-triggered sync (creator will show helix-eds-ca[bot] either way). The"
+          echo "'hlx6-ca-central-1'-environment entry GitHub auto-creates for this run (see"
+          echo "the Deployments tab) is what identifies this as an Actions-triggered sync."
+          curl -s "https://api.github.com/repos/$OWNER/$REPO/deployments?per_page=5" \
+            | jq -r '.[] | "created=\(.created_at)  env=\(.environment)  creator=\(.creator.login)  sha=\(.sha[0:10])"'
