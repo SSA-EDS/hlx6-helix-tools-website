@@ -1,0 +1,170 @@
+name: Manual Code Sync via Webhook (hlx6-ca-central-1)
+
+# Phase 1 (SSA multi-customer DA code-sync RFC): a manually-triggered replacement for the
+# code-sync GitHub App bot. Ports the bot's OWN mechanism - builds a signed, simulated
+# GitHub "push" webhook payload and POSTs it directly to the bot's webhook endpoint
+# (https://admin.entmseds.page/hook/github), exactly like a real push would.
+#
+# This is a deliberate design choice over calling the admin API directly: it needs only
+# ONE secret (the App's webhook secret) instead of four Azure AD values, and it reuses the
+# bot's own sync-scope logic (push-handler.js: full sync on "created", changed-files-only
+# otherwise) for free.
+#
+# Tradeoff (documented, not accidental): because this runs the bot's own code path, the
+# resulting GitHub Deployment record is indistinguishable from a real bot-triggered sync
+# (creator: helix-eds-ca[bot]). This workflow's own run history (who dispatched it, with
+# what inputs, and any required-reviewer approval) is the audit trail for this mechanism -
+# not the Deployments API.
+#
+# Manually tested and confirmed working end-to-end before this file was written.
+# See: https://wiki.corp.adobe.com/spaces/MSTeam/pages/3990094266
+#
+# One workflow file PER CUSTOMER, by design - not a shared/parameterized workflow.
+# Customers may need independent control over when their sync runs (code freezes,
+# different approval chains, different schedules), so each customer gets its own
+# file (manual-code-sync-<customer>.yml, named after their region/account, e.g.
+# hlx6-ca-central-1), its own Environment of the same name, and its own
+# GH_APP_WEBHOOK_SECRET - fully isolated from every other customer's.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Sync mode"
+        required: true
+        type: choice
+        options:
+          - changed-files
+          - full
+        default: changed-files
+      files:
+        description: "Space-separated file paths to sync (only used when mode = changed-files)"
+        required: false
+        default: "scripts/scripts.js"
+      sha:
+        description: "Commit sha to sync (defaults to current main HEAD if left blank)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  WEBHOOK_URL: https://admin.entmseds.page/hook/github
+  OWNER: SSA-EDS
+  REPO: hlx6-helix-tools-website
+  REF: main
+  INSTALLATION_ID: "148377690"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: hlx6-ca-central-1   # requires an Environment named "hlx6-ca-central-1" with
+                                      # one secret: GH_APP_WEBHOOK_SECRET (and, recommended,
+                                      # required reviewers).
+    steps:
+      - name: Determine target sha
+        id: target
+        run: |
+          if [ -n "${{ inputs.sha }}" ]; then
+            SHA="${{ inputs.sha }}"
+          else
+            SHA=$(curl -s "https://api.github.com/repos/$OWNER/$REPO/commits/$REF" | jq -r .sha)
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Requested by: ${{ github.actor }}"
+          echo "Mode: ${{ inputs.mode }}"
+          echo "Target sha: $SHA"
+
+      - name: Build payload and compute signature
+        env:
+          GH_APP_WEBHOOK_SECRET: ${{ secrets.GH_APP_WEBHOOK_SECRET }}
+          SHA: ${{ steps.target.outputs.sha }}
+          MODE: ${{ inputs.mode }}
+          FILES: ${{ inputs.files }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, hmac, hashlib, datetime, uuid
+
+          owner = os.environ["OWNER"]
+          repo = os.environ["REPO"]
+          ref = os.environ["REF"]
+          sha = os.environ["SHA"]
+          installation_id = int(os.environ["INSTALLATION_ID"])
+          mode = os.environ["MODE"]
+          files = os.environ["FILES"].split()
+          secret = os.environ["GH_APP_WEBHOOK_SECRET"].encode("utf-8")
+
+          timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          is_full = (mode == "full")
+
+          # Mirrors push-handler.js: created=true => full recursive sync ('*'),
+          # otherwise the commits[].modified list drives a changed-files-only sync.
+          commits = [] if is_full else [{
+              "id": sha, "timestamp": timestamp,
+              "added": [], "removed": [], "modified": files,
+          }]
+
+          payload = {
+              "ref": f"refs/heads/{ref}",
+              "created": is_full,
+              "deleted": False,
+              "forced": False,
+              "after": sha,
+              "head_commit": {"id": sha, "timestamp": timestamp},
+              "repository": {
+                  "full_name": f"{owner}/{repo}",
+                  "name": repo,
+                  "default_branch": ref,
+                  "owner": {"name": owner},
+              },
+              "installation": {"id": installation_id},
+              "commits": commits,
+          }
+
+          body = json.dumps(payload).encode("utf-8")
+          with open("payload.json", "wb") as f:
+              f.write(body)
+
+          # Signature computed over these exact bytes - the same bytes get sent in the
+          # next step, so signing and sending can never mismatch.
+          signature = "sha256=" + hmac.new(secret, body, hashlib.sha256).hexdigest()
+          with open("signature.txt", "w") as f:
+              f.write(signature)
+          with open("delivery_id.txt", "w") as f:
+              f.write(str(uuid.uuid4()))
+
+          print(f"Payload built (mode={mode}):")
+          print(json.dumps(payload, indent=2))
+          PYEOF
+
+      - name: Send simulated push webhook
+        run: |
+          SIGNATURE=$(cat signature.txt)
+          DELIVERY_ID=$(cat delivery_id.txt)
+          HTTP_CODE=$(curl -s -D headers.txt -o response.txt -w "%{http_code}" -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: push" \
+            -H "X-GitHub-Delivery: $DELIVERY_ID" \
+            -H "X-Hub-Signature-256: $SIGNATURE" \
+            --data-binary "@payload.json")
+          echo "--- Response headers ---"
+          cat headers.txt
+          echo "--- Response body ---"
+          cat response.txt
+          echo
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "202" ] && [ "$HTTP_CODE" != "204" ]; then
+            echo "::error::Webhook rejected with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "Webhook accepted ($HTTP_CODE)"
+
+      - name: Cross-check GitHub deployments (confirms the sync actually ran)
+        if: always()
+        run: |
+          sleep 3
+          echo "Note: entries below are indistinguishable from real bot-triggered syncs"
+          echo "(creator will show helix-eds-ca[bot] either way) - this run's own log above"
+          echo "is the actual audit trail for who triggered THIS sync."
+          curl -s "https://api.github.com/repos/$OWNER/$REPO/deployments?per_page=3" \
+            | jq -r '.[] | "created=\(.created_at)  creator=\(.creator.login)  sha=\(.sha[0:10])"'
