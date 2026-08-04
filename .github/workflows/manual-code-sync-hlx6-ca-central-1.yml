@@ -1,4 +1,4 @@
-name: Manual Code Sync via Webhook (hlx6-ca-central-1)
+name: hlx6-ca-central-1 - Manual Code Sync via Webhook
 
 # Phase 1 (SSA multi-customer DA code-sync RFC): a manually-triggered replacement for the
 # code-sync GitHub App bot. Ports the bot's OWN mechanism - builds a signed, simulated
