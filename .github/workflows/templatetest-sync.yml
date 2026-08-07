@@ -53,12 +53,12 @@ jobs:
             exit 1
           fi
           echo "Substituting {{BASE_DOMAIN}} -> $BASE_DOMAIN"
-          COUNT=$(grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
+          COUNT=$(grep -rl --exclude-dir=.git --exclude-dir=.github '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
           echo "files with token: $COUNT"
-          grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | while read -r f; do
+          grep -rl --exclude-dir=.git --exclude-dir=.github '{{BASE_DOMAIN}}' . | while read -r f; do
             sed -i "s/{{BASE_DOMAIN}}/$BASE_DOMAIN/g" "$f"
           done
-          LEFT=$(grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
+          LEFT=$(grep -rl --exclude-dir=.git --exclude-dir=.github '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
           echo "files still containing the token after substitution: $LEFT (expect 0)"
 
       - name: Commit substituted output to the synced branch
@@ -67,6 +67,12 @@ jobs:
           git config user.name "templatetest-sync"
           git config user.email "code-sync@ssa-eds.local"
           git checkout -B "$SYNCED_REF"
+          # The synced branch carries ONLY site content (what the code bus gets). Drop .github
+          # so the push never contains a workflow-file change - the Actions GITHUB_TOKEN is not
+          # allowed to create/update .github/workflows/* (a hard GitHub security restriction).
+          # .github is excluded from code-bus sync anyway (.hlxignore starts with .*), so this
+          # is purely to satisfy the push guard.
+          rm -rf .github
           git add -A
           git commit -m "chore: substituted build (BASE_DOMAIN=${{ vars.BASE_DOMAIN }}) from ${TEMPLATE_REF}@${GITHUB_SHA}" || echo "no changes to commit"
           git push -f origin "$SYNCED_REF"
