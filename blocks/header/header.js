@@ -302,7 +302,7 @@ export default async function decorate(block) {
 
     toolsList.querySelectorAll('a').forEach((a) => {
       const url = new URL(a.href);
-      if (url.hostname !== 'tools.{{BASE_DOMAIN}}.live' && url.hostname !== window.location.hostname) {
+      if (url.hostname !== 'tools.entmseds.live' && url.hostname !== window.location.hostname) {
         a.classList.add('button', 'outline');
         a.target = '_blank';
         a.title = a.textContent;

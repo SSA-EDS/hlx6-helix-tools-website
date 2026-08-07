@@ -33,7 +33,7 @@ export function processAuditLog(entries, org, site) {
       const cleanPath = entry.path.split('?')[0].split('#')[0];
       const ext = cleanPath.split('.').pop()?.toLowerCase() || '';
 
-      const url = `https://main--${site}--${org}.{{BASE_DOMAIN}}.page${entry.path}`;
+      const url = `https://main--${site}--${org}.entmseds.page${entry.path}`;
       return {
         hash: url,
         url,

@@ -34,8 +34,8 @@ export function detectContentSourceKind(url) {
   if (!url) return 'da';
   if (url.startsWith('https://drive.google.com/drive')) return 'google';
   if (url.includes('sharepoint.com/')) return 'onedrive';
-  if (url.startsWith('https://content.{{BASE_DOMAIN}}-da.live')) return 'da';
-  if (url.startsWith('https://api.{{BASE_DOMAIN}}.live/') || url.includes('adobeaemcloud')) return 'aem';
+  if (url.startsWith('https://content.entmseds-da.live')) return 'da';
+  if (url.startsWith('https://api.entmseds.live/') || url.includes('adobeaemcloud')) return 'aem';
   return 'byom';
 }
 

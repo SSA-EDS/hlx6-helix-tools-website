@@ -121,7 +121,7 @@ function createSnapshotCard(snapshot) {
       <div class="snapshot-header">
         <h3>${name}</h3>
         <div class="snapshot-actions">
-          <a href="snapshot-details.html?snapshot=https://main--${currentSite}--${currentOrg}.{{BASE_DOMAIN}}.page/.snapshots/${name}/.manifest.json" class="button small edit-snapshot">Edit</a>
+          <a href="snapshot-details.html?snapshot=https://main--${currentSite}--${currentOrg}.entmseds.page/.snapshots/${name}/.manifest.json" class="button small edit-snapshot">Edit</a>
           <button class="button small danger delete-snapshot" data-action="delete" data-snapshot="${name}">Delete</button>
         </div>
       </div>
@@ -131,21 +131,21 @@ function createSnapshotCard(snapshot) {
 
 /**
  * Parse snapshot URL to extract org, site, and snapshot name
- * @param {string} snapshotUrl - URL like https://main--demo--org.{{BASE_DOMAIN}}.page/.snapshots/name/.manifest.json
+ * @param {string} snapshotUrl - URL like https://main--demo--org.entmseds.page/.snapshots/name/.manifest.json
  * @returns {Object|null} - {org, site, snapshotName} or null if invalid
  */
 function parseSnapshotUrl(snapshotUrl) {
   try {
     const { hostname, pathname } = new URL(snapshotUrl);
 
-    // Parse hostname pattern: main--{site}--{org}.{{BASE_DOMAIN}}.page
+    // Parse hostname pattern: main--{site}--{org}.entmseds.page
     const hostParts = hostname.split('--');
-    if (hostParts.length !== 3 || !hostname.endsWith('.{{BASE_DOMAIN}}.page')) {
+    if (hostParts.length !== 3 || !hostname.endsWith('.entmseds.page')) {
       return null;
     }
 
     const [, site, orgWithDomain] = hostParts;
-    const org = orgWithDomain.replace('.{{BASE_DOMAIN}}.page', '');
+    const org = orgWithDomain.replace('.entmseds.page', '');
 
     // Parse path pattern: /.snapshots/{snapshotName}/.manifest.json
     const pathMatch = pathname.match(/^\/\.snapshots\/([^/]+)\/\.manifest\.json$/);

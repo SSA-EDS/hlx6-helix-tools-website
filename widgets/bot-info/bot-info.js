@@ -24,7 +24,7 @@ const CONTENT_URL_PLACEHOLDERS = {
 };
 
 /** Fixed content source URL for AEM sources. */
-const aemContentUrl = (org, site) => `https://api.{{BASE_DOMAIN}}.live/${org}/sites/${site}/source`;
+const aemContentUrl = (org, site) => `https://api.entmseds.live/${org}/sites/${site}/source`;
 
 /**
  * Pull the one-time token and its api-key id out of the URL fragment (if
@@ -98,12 +98,12 @@ function populateStaticFields(widget, { org, site }) {
 
   const previewLink = widget.querySelector('.bot-info-preview');
   if (previewLink) {
-    previewLink.href = `https://main--${site}--${org}.{{BASE_DOMAIN}}.page/`;
+    previewLink.href = `https://main--${site}--${org}.entmseds.page/`;
     previewLink.textContent = previewLink.href;
   }
   const liveLink = widget.querySelector('.bot-info-live');
   if (liveLink) {
-    liveLink.href = `https://main--${site}--${org}.{{BASE_DOMAIN}}.live/`;
+    liveLink.href = `https://main--${site}--${org}.entmseds.live/`;
     liveLink.textContent = liveLink.href;
   }
 }
@@ -166,7 +166,7 @@ function renderForm(widget, config, {
 
   // content source — DA is the default with a fixed, read-only URL; the
   // "use a different content source" checkbox reveals the non-DA options.
-  widget.querySelector('.bot-info-da-url').value = `https://content.{{BASE_DOMAIN}}-da.live/${org}/${site}`;
+  widget.querySelector('.bot-info-da-url').value = `https://content.entmseds-da.live/${org}/${site}`;
 
   const typeSelect = widget.querySelector('.bot-info-content-type');
   CONTENT_SOURCE_KINDS.filter((k) => k.value !== 'da').forEach(({ value, label }) => {
@@ -275,7 +275,7 @@ async function submitConfig(api, widget, config, { org, site, newOrg }, consoleB
   const kind = useDifferent ? widget.querySelector('.bot-info-content-type').value : 'da';
   const contentUrl = useDifferent
     ? widget.querySelector('.bot-info-content-url').value.trim()
-    : `https://content.{{BASE_DOMAIN}}-da.live/${org}/${site}`;
+    : `https://content.entmseds-da.live/${org}/${site}`;
   const suffix = widget.querySelector('.bot-info-content-suffix').value.trim();
   const source = buildContentSource(contentUrl, kind, suffix);
   // update only the content sub-config; POSTing the whole site config would
@@ -311,7 +311,7 @@ async function deleteApiKey(api, { org, site, newOrg }, tokenId, consoleBlock) {
  * otherwise straight at the content source URL.
  */
 function setCreateContentLink(widget, org, site, kind, contentUrl) {
-  const editUrl = kind === 'da' ? `https://{{BASE_DOMAIN}}-da.live/#/${org}/${site}` : contentUrl;
+  const editUrl = kind === 'da' ? `https://entmseds-da.live/#/${org}/${site}` : contentUrl;
   const contentSource = widget.querySelector('.bot-info-content-source');
   if (!contentSource) return;
   const link = document.createElement('a');
@@ -376,7 +376,7 @@ function showConfirmation(widget, ctx, summary) {
     renderDidList(widget, ctx, summary);
     setCreateContentLink(widget, org, site, summary.contentKind, summary.contentUrl);
   } else {
-    setCreateContentLink(widget, org, site, 'da', `https://content.{{BASE_DOMAIN}}-da.live/${org}/${site}`);
+    setCreateContentLink(widget, org, site, 'da', `https://content.entmseds-da.live/${org}/${site}`);
   }
 
   setHidden(widget.querySelector('.bot-info-loading'), true);

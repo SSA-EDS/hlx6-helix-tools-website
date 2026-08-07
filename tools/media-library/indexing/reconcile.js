@@ -76,7 +76,7 @@ function toLinkedContentEntry(filePath, doc, fileEvent, status, org, repo) {
   if (filePath.startsWith(Paths.FRAGMENTS) && filePath.endsWith(Paths.EXT_HTML)) {
     urlPath = filePath.replace(/\.html$/, '');
   }
-  const url = `https://main--${repo}--${org}.{{BASE_DOMAIN}}.page${urlPath}`;
+  const url = `https://main--${repo}--${org}.entmseds.page${urlPath}`;
 
   /* Entry shape: hash, url, name, timestamp, user, operation, type, doc, status */
   return {

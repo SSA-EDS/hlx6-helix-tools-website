@@ -587,7 +587,7 @@ const CHECKS = [
 /** @param {string} originTriple branch--site--org */
 function buildAemLivePageUrl(originTriple, prodUrlString) {
   const prodUrlObj = new URL(prodUrlString);
-  return `https://${originTriple}.{{BASE_DOMAIN}}.live${prodUrlObj.pathname}`;
+  return `https://${originTriple}.entmseds.live${prodUrlObj.pathname}`;
 }
 
 function parseAemUrl(urlString) {
@@ -595,15 +595,15 @@ function parseAemUrl(urlString) {
     const url = new URL(urlString);
     const { hostname, pathname } = url;
 
-    // Check if it's an .{{BASE_DOMAIN}}.live or .{{BASE_DOMAIN}}.page URL
-    if (!hostname.endsWith('.{{BASE_DOMAIN}}.live') && !hostname.endsWith('.{{BASE_DOMAIN}}.page')) {
-      throw new Error('URL must be an .{{BASE_DOMAIN}}.live or .{{BASE_DOMAIN}}.page domain');
+    // Check if it's an .entmseds.live or .entmseds.page URL
+    if (!hostname.endsWith('.entmseds.live') && !hostname.endsWith('.entmseds.page')) {
+      throw new Error('URL must be an .entmseds.live or .entmseds.page domain');
     }
 
-    // Parse: branch--site--org.{{BASE_DOMAIN}}.live
+    // Parse: branch--site--org.entmseds.live
     const parts = hostname.split('.')[0].split('--');
     if (parts.length < 3) {
-      throw new Error('Invalid AEM URL format. Expected: branch--site--org.{{BASE_DOMAIN}}.live');
+      throw new Error('Invalid AEM URL format. Expected: branch--site--org.entmseds.live');
     }
 
     const [branch, site, org] = parts;
@@ -886,7 +886,7 @@ function materializeCdnProdCheckResult(cdnConfig) {
   if (!cdnConfig || cdnConfig.type === 'managed') {
     updateCheckState(checkId, 'pass', 'Managed');
     addResultLine(checkId, 'Using AEM managed CDN (Fastly)', 'success');
-    addResultLine(checkId, 'No custom cdn.prod configuration - site served directly from .{{BASE_DOMAIN}}.live', 'info');
+    addResultLine(checkId, 'No custom cdn.prod configuration - site served directly from .entmseds.live', 'info');
     updateDetectedCdn('managed');
     return { score: 100, cdnConfig: { type: 'managed', host: null } };
   }
@@ -929,7 +929,7 @@ async function checkCdnConfig(org, site, sharedCdnProd = null) {
     try {
       addResultLine(
         checkId,
-        'Using CDN production config from this link (admin.{{BASE_DOMAIN}}.page was not loaded).',
+        'Using CDN production config from this link (admin.entmseds.page was not loaded).',
         'info',
       );
       return materializeCdnProdCheckResult(sharedCdnProd);
@@ -995,7 +995,7 @@ async function checkPurge(cdnConfig, sharedPurgeSnapshot = null) {
 
   try {
     // Build purge test request based on CDN type
-    const purgeUrl = 'https://admin.{{BASE_DOMAIN}}.page/hook/byocdn-push-invalidation/';
+    const purgeUrl = 'https://admin.entmseds.page/hook/byocdn-push-invalidation/';
 
     // Prepare form data based on CDN type
     const formData = new URLSearchParams();
@@ -1266,7 +1266,7 @@ async function checkCaching(cdnConfig, aemUrl, prodPageUrlOverride = null) {
 async function check404Caching(cdnConfig, aemUrl, prodPageUrlOverride = null) {
   const checkId = 'check-404-caching';
 
-  // Use production host, or {{BASE_DOMAIN}}.live host for managed CDN
+  // Use production host, or entmseds.live host for managed CDN
   const prodHost = prodPageUrlOverride
     ? new URL(prodPageUrlOverride).host
     : (cdnConfig?.host || aemUrl.host);
@@ -1461,8 +1461,8 @@ async function checkImages(cdnConfig, aemUrl, org, site, branch, prodPageUrlOver
   updateCheckState(checkId, 'running', 'Analyzing...');
 
   try {
-    // Fetch the page content from .{{BASE_DOMAIN}}.live to find images
-    const aemPageUrl = `https://${branch}--${site}--${org}.{{BASE_DOMAIN}}.live${aemUrl.pathname}`;
+    // Fetch the page content from .entmseds.live to find images
+    const aemPageUrl = `https://${branch}--${site}--${org}.entmseds.live${aemUrl.pathname}`;
     const prodPageUrl = prodPageUrlOverride
       ? new URL(prodPageUrlOverride).href
       : `https://${cdnConfig.host}${aemUrl.pathname}`;
@@ -1560,7 +1560,7 @@ async function checkImages(cdnConfig, aemUrl, org, site, branch, prodPageUrlOver
             if (!sizeMatch) {
               addResultLine(
                 checkId,
-                `  Body: {{BASE_DOMAIN}}.live origin ${formatBytes(aemBodyBytes)}, Prod ${formatBytes(prodBodyBytes)}`,
+                `  Body: entmseds.live origin ${formatBytes(aemBodyBytes)}, Prod ${formatBytes(prodBodyBytes)}`,
                 'warning',
               );
             }
@@ -1615,7 +1615,7 @@ async function checkRedirects(org, site, branch, cdnConfig) {
 
   try {
     // Fetch redirects.json
-    const redirectsUrl = `https://${branch}--${site}--${org}.{{BASE_DOMAIN}}.live/redirects.json`;
+    const redirectsUrl = `https://${branch}--${site}--${org}.entmseds.live/redirects.json`;
     const resp = await fetch(corsProxy(redirectsUrl));
 
     if (!resp.ok) {
@@ -1657,7 +1657,7 @@ async function checkRedirects(org, site, branch, cdnConfig) {
     // Determine base URL for testing
     const baseHost = cdnConfig?.host
       ? `https://${cdnConfig.host}`
-      : `https://${branch}--${site}--${org}.{{BASE_DOMAIN}}.live`;
+      : `https://${branch}--${site}--${org}.entmseds.live`;
 
     // Construct test URL with query param
     const testUrl = `${baseHost}${source}${source.includes('?') ? '&' : '?'}${randomParam}`;
@@ -1878,7 +1878,7 @@ function extractOriginFromHeaders(headers) {
 // Fallback: Extract origin from HTML content
 function extractOriginFromHtml(html) {
   // Look for URLs matching AEM Edge Delivery patterns
-  // Patterns: branch--site--org.{{BASE_DOMAIN}}.live, branch--site--org.{{BASE_DOMAIN}}.page,
+  // Patterns: branch--site--org.entmseds.live, branch--site--org.entmseds.page,
   //           branch--site--org.hlx.live, branch--site--org.hlx.page
   const urlPattern = /https?:\/\/([a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+)\.(aem|hlx)\.(live|page)/gi;
   const matches = html.matchAll(urlPattern);
@@ -1920,7 +1920,7 @@ async function discoverOrigin(prodUrl) {
   }
 
   if (origins.length === 0) {
-    throw new Error('No AEM origin found. The site may not be using AEM Edge Delivery Services, or no .{{BASE_DOMAIN}}.live/.hlx.live references were found in the page.');
+    throw new Error('No AEM origin found. The site may not be using AEM Edge Delivery Services, or no .entmseds.live/.hlx.live references were found in the page.');
   }
 
   return origins;
@@ -2011,7 +2011,7 @@ function setupFormSubmit() {
     }
 
     if (!prod) {
-      showError('Enter your production page URL, or use “Enter AEM page URL manually” and provide your .{{BASE_DOMAIN}}.live or .{{BASE_DOMAIN}}.page page URL.');
+      showError('Enter your production page URL, or use “Enter AEM page URL manually” and provide your .entmseds.live or .entmseds.page page URL.');
       return;
     }
 

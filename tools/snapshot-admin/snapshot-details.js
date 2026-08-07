@@ -118,21 +118,21 @@ function logResponse(cols) {
 
 /**
  * Parse snapshot URL to extract org, site, and snapshot name
- * @param {string} snapshotUrl - URL like https://main--demo--org.{{BASE_DOMAIN}}.page/.snapshots/name/.manifest.json
+ * @param {string} snapshotUrl - URL like https://main--demo--org.entmseds.page/.snapshots/name/.manifest.json
  * @returns {Object|null} - {org, site, snapshotName} or null if invalid
  */
 function parseSnapshotUrl(snapshotUrl) {
   try {
     const { hostname, pathname } = new URL(snapshotUrl);
 
-    // Parse hostname pattern: main--{site}--{org}.{{BASE_DOMAIN}}.page
+    // Parse hostname pattern: main--{site}--{org}.entmseds.page
     const hostParts = hostname.split('--');
-    if (hostParts.length !== 3 || !hostname.endsWith('.{{BASE_DOMAIN}}.page')) {
+    if (hostParts.length !== 3 || !hostname.endsWith('.entmseds.page')) {
       return null;
     }
 
     const [, site, orgWithDomain] = hostParts;
-    const org = orgWithDomain.replace('.{{BASE_DOMAIN}}.page', '');
+    const org = orgWithDomain.replace('.entmseds.page', '');
 
     // Parse path pattern: /.snapshots/{snapshotName}/.manifest.json
     const pathMatch = pathname.match(/^\/\.snapshots\/([^/]+)\/\.manifest\.json$/);
@@ -168,7 +168,7 @@ async function createSnapshotDetailsHTML(snapshot, manifest) {
   const lockStatus = isLocked ? 'Locked' : 'Unlocked';
   const lockDate = manifest.locked ? new Date(manifest.locked).toLocaleString() : '';
   const customReviewHost = await getCustomReviewHost();
-  const reviewHost = customReviewHost || `${name}--main--${currentSite}--${currentOrg}.{{BASE_DOMAIN}}.reviews`;
+  const reviewHost = customReviewHost || `${name}--main--${currentSite}--${currentOrg}.entmseds.reviews`;
 
   return `
     <div class="snapshot-card" data-snapshot="${name}">
@@ -195,7 +195,7 @@ async function createSnapshotDetailsHTML(snapshot, manifest) {
           </div>
           <div class="form-field">
             <label for="urls-${name}">URLs (one per line)</label>
-            <textarea id="urls-${name}" name="urls" rows="10" placeholder="Enter URLs, one per line" autocomplete="on">${manifest.resources ? manifest.resources.map((resource) => `https://main--${currentSite}--${currentOrg}.{{BASE_DOMAIN}}.page${resource.path}`).join('\n') : ''}</textarea>
+            <textarea id="urls-${name}" name="urls" rows="10" placeholder="Enter URLs, one per line" autocomplete="on">${manifest.resources ? manifest.resources.map((resource) => `https://main--${currentSite}--${currentOrg}.entmseds.page${resource.path}`).join('\n') : ''}</textarea>
           </div>
           <div class="snapshot-actions">
             <button type="button" class="button" data-action="save" data-snapshot="${name}">Save</button>

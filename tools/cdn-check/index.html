@@ -23,7 +23,7 @@
       <h1>CDN Check</h1>
       <p>
         Validate your CDN configuration and production setup. Enter your live production page URL first;
-        we detect your <code>.{{BASE_DOMAIN}}.live</code> origin from CDN response headers when possible. If that does not work,
+        we detect your <code>.entmseds.live</code> origin from CDN response headers when possible. If that does not work,
         enter the AEM page URL yourself (or use “Enter AEM page URL manually” to skip detection).
       </p>
     </div>
@@ -40,22 +40,22 @@
             autocomplete="url"
           />
           <div class="field-help-text">
-            <p>Use the URL visitors see in production (same path you want to compare on <code>.{{BASE_DOMAIN}}.live</code> when possible).</p>
+            <p>Use the URL visitors see in production (same path you want to compare on <code>.entmseds.live</code> when possible).</p>
             <p id="origin-detect-hint" class="origin-detect-hint" aria-live="polite"></p>
           </div>
         </div>
         <div id="aem-url-field-wrapper" class="aem-url-field-wrapper" hidden>
           <div class="form-field">
-            <label for="url">Corresponding {{BASE_DOMAIN}}.live origin url</label>
+            <label for="url">Corresponding entmseds.live origin url</label>
             <input
               type="url"
               id="url"
               name="url"
-              placeholder="https://main--mysite--myorg.{{BASE_DOMAIN}}.live/path/to/page"
+              placeholder="https://main--mysite--myorg.entmseds.live/path/to/page"
               autocomplete="off"
             />
             <div class="field-help-text">
-              <p>Your <code>.{{BASE_DOMAIN}}.live</code> or <code>.{{BASE_DOMAIN}}.page</code> URL for this page. Shown when automatic origin detection does not find a match, or if you chose to enter it manually.</p>
+              <p>Your <code>.entmseds.live</code> or <code>.entmseds.page</code> URL for this page. Shown when automatic origin detection does not find a match, or if you chose to enter it manually.</p>
             </div>
           </div>
         </div>
@@ -161,7 +161,7 @@
             <span class="check-status">Pending</span>
           </div>
           <div class="check-details" aria-hidden="true">
-            <p class="check-description">Compares WebP <code>picture</code> <code>source</code> URLs (<code>format=webp</code> or <code>type=image/webp</code>) between <code>.{{BASE_DOMAIN}}.live</code> and production.</p>
+            <p class="check-description">Compares WebP <code>picture</code> <code>source</code> URLs (<code>format=webp</code> or <code>type=image/webp</code>) between <code>.entmseds.live</code> and production.</p>
             <div class="check-result"></div>
           </div>
         </li>

@@ -22,9 +22,9 @@ export const MediaType = Object.freeze({
 });
 
 export const Domains = Object.freeze({
-  AEM_PAGE: '.{{BASE_DOMAIN}}.page',
-  AEM_LIVE: '.{{BASE_DOMAIN}}.live',
-  SAME_ORIGIN: ['.{{BASE_DOMAIN}}.page', '.{{BASE_DOMAIN}}.live'],
+  AEM_PAGE: '.entmseds.page',
+  AEM_LIVE: '.entmseds.live',
+  SAME_ORIGIN: ['.entmseds.page', '.entmseds.live'],
 });
 
 export const Paths = Object.freeze({

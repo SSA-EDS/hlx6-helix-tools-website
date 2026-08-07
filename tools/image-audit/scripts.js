@@ -522,12 +522,12 @@ function updateError(errorWrapper, errCode, org, site, sitemap) {
       case 401:
         return {
           title: '401 Unauthorized Error',
-          msg: `Unable to display results. <a target="_blank" href="https://main--${site}--${org}.{{BASE_DOMAIN}}.page">Sign in to the ${site} project sidekick</a> to view the results.`,
+          msg: `Unable to display results. <a target="_blank" href="https://main--${site}--${org}.entmseds.page">Sign in to the ${site} project sidekick</a> to view the results.`,
         };
       case 404:
         return {
           title: '404 Not Found Error',
-          msg: `<a target="_blank" href="https://main--${site}--${org}.{{BASE_DOMAIN}}.live${sitemap}">${sitemap}</a> is not found. Ensure your sitemap / query index path is correct.`,
+          msg: `<a target="_blank" href="https://main--${site}--${org}.entmseds.live${sitemap}">${sitemap}</a> is not found. Ensure your sitemap / query index path is correct.`,
         };
       case 499:
         return {

@@ -214,7 +214,7 @@ export async function fetchPageMarkdown(pagePath, org, repo, ref = 'main') {
 
     // Use CORS proxy to fetch page markdown
     // Proxy URL is a Cloudflare Worker that forwards requests with CORS headers
-    const pageUrl = `https://${ref}--${repo}--${org}.{{BASE_DOMAIN}}.page${path}`;
+    const pageUrl = `https://${ref}--${repo}--${org}.entmseds.page${path}`;
     const url = `${CORS_PROXY_URL}?url=${encodeURIComponent(pageUrl)}`;
 
     const resp = await fetch(url);

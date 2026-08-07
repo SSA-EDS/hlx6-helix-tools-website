@@ -29,7 +29,7 @@ async function writeIntent(org, site, entry) {
 }
 
 // Resolves the resource path behind an authoring-surface referrer (SharePoint,
-// Google Docs, the admin.{{BASE_DOMAIN}}.page editor, etc) by asking the Admin API to
+// Google Docs, the admin.entmseds.page editor, etc) by asking the Admin API to
 // reverse-map the source document URL via its `editUrl` status lookup — the
 // same mechanism Sidekick itself uses while editing, since the referrer URL
 // there has no relation to the page's web path.

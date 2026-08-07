@@ -248,7 +248,7 @@ function decorateLinks(main) {
     if (!a.href) return; // Skip anchors without href
     try {
       const url = new URL(a.href);
-      if (url.hostname === 'tools.{{BASE_DOMAIN}}.live') {
+      if (url.hostname === 'tools.entmseds.live') {
         a.href = url.pathname;
       }
     } catch (e) {

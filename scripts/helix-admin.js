@@ -1,4 +1,4 @@
-const ADMIN_BASE = 'https://admin.{{BASE_DOMAIN}}.page';
+const ADMIN_BASE = 'https://admin.entmseds.page';
 
 const CONTENT_TYPES = {
   json: 'application/json',

@@ -42,7 +42,7 @@ export const getContentSourceType = (contentUrl, contentSourceType, isLoading = 
   }
 
   if (contentSourceType === 'markup') {
-    if (contentUrl?.startsWith('https://content.{{BASE_DOMAIN}}-da.live')) {
+    if (contentUrl?.startsWith('https://content.entmseds-da.live')) {
       return { type: 'da', label: 'DA' };
     }
 
@@ -146,9 +146,9 @@ export const compareSites = (a, b, selectedSite, favorites) => {
 export const getDAEditorURL = (contentUrl) => {
   if (!contentUrl) return null;
 
-  if (contentUrl.startsWith('https://content.{{BASE_DOMAIN}}-da.live/') || contentUrl.startsWith('https://stage-content.{{BASE_DOMAIN}}-da.live/')) {
-    const path = contentUrl.replace(/^https:\/\/(stage-)?content\.{{BASE_DOMAIN}}-da\.live\//, '');
-    return `https://{{BASE_DOMAIN}}-da.live/#/${path}`;
+  if (contentUrl.startsWith('https://content.entmseds-da.live/') || contentUrl.startsWith('https://stage-content.entmseds-da.live/')) {
+    const path = contentUrl.replace(/^https:\/\/(stage-)?content\.entmseds-da\.live\//, '');
+    return `https://entmseds-da.live/#/${path}`;
   }
 
   return contentUrl;
