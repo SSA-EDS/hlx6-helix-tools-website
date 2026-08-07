@@ -51,7 +51,7 @@ export const runPsiForCard = async (card, siteName, orgValue) => {
     </div>
   `;
 
-  const liveUrl = `https://main--${siteName}--${orgValue}.entmseds.live/`;
+  const liveUrl = `https://main--${siteName}--${orgValue}.{{BASE_DOMAIN}}.live/`;
   const resp = await executeAdminRequest(
     () => admin.psi({ org: orgValue, site: siteName }).get('', { params: { url: liveUrl } }),
     { org: orgValue, site: siteName, policy: AuthMode.NONE },

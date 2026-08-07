@@ -96,7 +96,7 @@ async function removeSite(org, site) {
 async function fetchUserInfo(userInfoElem, org, site, loginInfo) {
   let userInfo = '';
   if (Array.isArray(loginInfo) && loginInfo.includes(org)) {
-    const resp = await fetch(`https://admin.entmseds.page/profile/${org}/${site}`);
+    const resp = await fetch(`https://admin.{{BASE_DOMAIN}}.page/profile/${org}/${site}`);
     if (resp.ok) {
       const { profile } = await resp.json();
       if (profile) {
@@ -136,7 +136,7 @@ function createLoginButton(org, loginInfo, closeModal) {
 
     const selectedSite = target.closest('li').querySelector(`input[name="profile-${org}-site"]:checked`)?.value;
 
-    const loginUrl = new URL(`https://admin.entmseds.page/${action}/${org}/${selectedSite}/main`);
+    const loginUrl = new URL(`https://admin.{{BASE_DOMAIN}}.page/${action}/${org}/${selectedSite}/main`);
     if (!loggedIn) {
       if (opsMode) {
         loginUrl.searchParams.append('idp', 'microsoft');
@@ -339,7 +339,7 @@ async function updateProjects(dialog, focusedOrg) {
         <label for="profile-${org}-site-${i}">${title || site}</label>
         <a
           target="_blank"
-          href="https://main--${site}--${org}.entmseds.page/"
+          href="https://main--${site}--${org}.{{BASE_DOMAIN}}.page/"
           title="Open ${site}"
         ><span class="external-link"></span><span class="user-info"></span></a>
       `;

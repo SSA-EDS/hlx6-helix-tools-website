@@ -14,14 +14,14 @@ async function loadCSS(href) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadCSS('https://tools.entmseds.live/errors/errors.css');
+  await loadCSS('https://tools.{{BASE_DOMAIN}}.live/errors/errors.css');
 
   const description = document.querySelector('p');
   const { hostname } = window.location;
   const rso = hostname.split('.')[0];
   const suffix = hostname.split('.')[2] === 'page' ? 'page' : 'live';
 
-  description.innerHTML = `Your request has been blocked, please use <a href="https://${rso}.aem.${suffix}" target="_blank">${rso}.entmseds.live</a> instead.<br><br>
+  description.innerHTML = `Your request has been blocked, please use <a href="https://${rso}.aem.${suffix}" target="_blank">${rso}.{{BASE_DOMAIN}}.live</a> instead.<br><br>
     See <a href="https://www.aem.live/developer/upgrade" target="_blank">https://www.aem.live/developer/upgrade</a> for more information.`;
 
   if (window.location.origin === 'http://localhost:3000') {

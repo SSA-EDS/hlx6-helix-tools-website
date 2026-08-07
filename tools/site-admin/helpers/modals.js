@@ -9,7 +9,7 @@ import {
 
 /* eslint-disable no-alert, no-restricted-globals */
 
-// Preview/live hostnames follow `{branch}--{site}--{org}.entmseds.page` and must fit
+// Preview/live hostnames follow `{branch}--{site}--{org}.{{BASE_DOMAIN}}.page` and must fit
 // within the 63-character DNS label limit. We validate against the `main` branch
 // because every site has one — feature branches are warned about separately.
 const MAX_HOSTNAME_LENGTH = 63;
@@ -815,7 +815,7 @@ export const openAddSiteModal = async (
     </div>
     <form class="add-site-form">
       <div class="form-field">
-        <label for="new-site-name">Site Name <span class="label-preview">(Domain Preview: <code><span class="label-domain"></span>.entmseds.page</code>)</span></label>
+        <label for="new-site-name">Site Name <span class="label-preview">(Domain Preview: <code><span class="label-domain"></span>.{{BASE_DOMAIN}}.page</code>)</span></label>
         <input type="text" id="new-site-name" required placeholder="my-site" pattern="[a-z0-9-]+" />
         <p class="field-hint">Lowercase letters, numbers, and hyphens only</p>
         <p class="field-error" role="alert" aria-hidden="true"></p>

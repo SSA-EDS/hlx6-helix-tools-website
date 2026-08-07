@@ -423,7 +423,7 @@ const renderPurgeSection = (container, data) => {
       <div class="form purge-form">
         <div class="field">
           <label for="purge-host-input">.live Host</label>
-          <input id="purge-host-input" type="text" placeholder="https://ref--repo--owner.entmseds.live" pattern="[^.]+.[^.]+" value="${escapeHtml(inferredDotLiveHost)}"/>
+          <input id="purge-host-input" type="text" placeholder="https://ref--repo--owner.{{BASE_DOMAIN}}.live" pattern="[^.]+.[^.]+" value="${escapeHtml(inferredDotLiveHost)}"/>
         </div>
         <div class="field">
           <label for="purge-keys-input">Cache Keys</label>

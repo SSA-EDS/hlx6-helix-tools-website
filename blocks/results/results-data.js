@@ -653,7 +653,7 @@ export const loadCalculatorData = (params) => {
 };
 
 export const loadData = (url, forceUpdate = false, customSitemap = '', filterPath = '') => {
-  if (window.location.hostname.includes('hlx.live') || window.location.hostname.includes('entmseds.live')) {
+  if (window.location.hostname.includes('hlx.live') || window.location.hostname.includes('{{BASE_DOMAIN}}.live')) {
     ioBaseURL = IO_BASE_URL_PROD;
   } else {
     ioBaseURL = IO_BASE_URL_STAGE;

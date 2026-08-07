@@ -123,12 +123,12 @@ export function formatDuration(iso) {
 
 export function buildPageUrl(org, site, path) {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `https://main--${site}--${org}.entmseds.page${cleanPath}`;
+  return `https://main--${site}--${org}.{{BASE_DOMAIN}}.page${cleanPath}`;
 }
 
 export function buildSnapshotUrl(org, site, snapshotId) {
   const name = snapshotId.startsWith('/') ? snapshotId.slice(1) : snapshotId;
-  const manifest = `https://main--${site}--${org}.entmseds.page/.snapshots/${name}/.manifest.json`;
+  const manifest = `https://main--${site}--${org}.{{BASE_DOMAIN}}.page/.snapshots/${name}/.manifest.json`;
   return `/tools/snapshot-admin/snapshot-details.html?snapshot=${encodeURIComponent(manifest)}`;
 }
 
@@ -143,7 +143,7 @@ export function isAtLeastFiveMinAhead(localDatetimeValue) {
 // the resource's web path. Anything else — SharePoint, Google Docs, etc.
 // — is treated as edit mode, where Sidekick's `referrer` is
 // the source document's URL instead (see resolvePagePath in schedule.js)
-const PAGE_HOST_SUFFIXES = ['.entmseds.page', '.entmseds.live', '.entmseds.reviews'];
+const PAGE_HOST_SUFFIXES = ['.{{BASE_DOMAIN}}.page', '.{{BASE_DOMAIN}}.live', '.{{BASE_DOMAIN}}.reviews'];
 
 export function isPageHost(hostname) {
   return PAGE_HOST_SUFFIXES.some((suffix) => hostname.endsWith(suffix));

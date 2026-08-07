@@ -1,4 +1,4 @@
 mountpoints:
   /:
-    url: https://content.entmseds-da.live/ssa-eds/hlx6-helix-tools-website/
+    url: https://content.{{BASE_DOMAIN}}-da.live/ssa-eds/hlx6-helix-tools-website/
     type: markup

@@ -1,0 +1,149 @@
+name: templatetest - Substitute + Sync (BASE_DOMAIN)
+
+# TEMPLATIZE TEST (SSA multi-customer DA code-sync RFC, Phase 3 / variant (a)).
+# Runs ON the `templatetest` branch, which holds the site with the customer domain
+# replaced by the {{BASE_DOMAIN}} placeholder. On manual dispatch this workflow:
+#   1. checks out templatetest,
+#   2. substitutes {{BASE_DOMAIN}} -> the per-customer value (Environment variable),
+#   3. force-pushes the substituted result to the `templatetest-synced` branch,
+#   4. triggers a full code-sync of `templatetest-synced` via a signed, simulated
+#      push webhook to the customer's Helix admin (same mechanism as the prototype).
+#
+# The synced result lands at code-bus prefix .../templatetest-synced/ and is viewable
+# at  https://templatetest-synced--<repo>--<org>.<BASE_DOMAIN>.page/  --  ISOLATED from
+# the live `main` site. Because substitution is the exact reverse of templatization,
+# the output should be byte-identical to today's production (a correctness check).
+#
+# Requires the GitHub App (helix-eds-ca) to remain INSTALLED on the repo (admin needs it
+# for content access) but it can be event-UNSUBSCRIBED (no auto-trigger) - this workflow
+# POSTs the webhook directly, unaffected by the App's event subscriptions.
+#
+# See: https://wiki.corp.adobe.com/spaces/MSTeam/pages/3990094266
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to force-push the templatetest-synced branch
+
+concurrency: templatetest-sync   # prevent overlapping runs racing the synced branch
+
+env:
+  TEMPLATE_REF: templatetest
+  SYNCED_REF: templatetest-synced
+  INSTALLATION_ID: "148377690"
+
+jobs:
+  substitute-and-sync:
+    runs-on: ubuntu-latest
+    environment: hlx6-ca-central-1   # holds: secret GH_APP_WEBHOOK_SECRET, variable BASE_DOMAIN
+    steps:
+      - name: Checkout template branch
+        uses: actions/checkout@v4
+        with:
+          ref: templatetest
+          fetch-depth: 0
+
+      - name: Substitute {{BASE_DOMAIN}} with the per-customer value
+        env:
+          BASE_DOMAIN: ${{ vars.BASE_DOMAIN }}
+        run: |
+          if [ -z "$BASE_DOMAIN" ]; then
+            echo "::error::Environment variable BASE_DOMAIN is not set on the 'hlx6-ca-central-1' environment"
+            exit 1
+          fi
+          echo "Substituting {{BASE_DOMAIN}} -> $BASE_DOMAIN"
+          COUNT=$(grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
+          echo "files with token: $COUNT"
+          grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | while read -r f; do
+            sed -i "s/{{BASE_DOMAIN}}/$BASE_DOMAIN/g" "$f"
+          done
+          LEFT=$(grep -rl --exclude-dir=.git '{{BASE_DOMAIN}}' . | wc -l | tr -d ' ')
+          echo "files still containing the token after substitution: $LEFT (expect 0)"
+
+      - name: Commit substituted output to the synced branch
+        id: synced
+        run: |
+          git config user.name "templatetest-sync"
+          git config user.email "code-sync@ssa-eds.local"
+          git checkout -B "$SYNCED_REF"
+          git add -A
+          git commit -m "chore: substituted build (BASE_DOMAIN=${{ vars.BASE_DOMAIN }}) from ${TEMPLATE_REF}@${GITHUB_SHA}" || echo "no changes to commit"
+          git push -f origin "$SYNCED_REF"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Pushed $SYNCED_REF at $(git rev-parse HEAD)"
+
+      - name: Build full-sync payload and signature
+        env:
+          GH_APP_WEBHOOK_SECRET: ${{ secrets.GH_APP_WEBHOOK_SECRET }}
+          SYNCED_SHA: ${{ steps.synced.outputs.sha }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, hmac, hashlib, datetime, uuid
+
+          owner, repo = os.environ["GITHUB_REPOSITORY"].split("/", 1)
+          ref = os.environ["SYNCED_REF"]
+          sha = os.environ["SYNCED_SHA"]
+          installation_id = int(os.environ["INSTALLATION_ID"])
+          secret = os.environ["GH_APP_WEBHOOK_SECRET"].encode("utf-8")
+          ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+          # created=true => the bot's push-handler does a FULL recursive sync of this ref.
+          payload = {
+              "ref": f"refs/heads/{ref}",
+              "created": True,
+              "deleted": False,
+              "forced": False,
+              "after": sha,
+              "head_commit": {"id": sha, "timestamp": ts},
+              "repository": {
+                  "full_name": f"{owner}/{repo}",
+                  "name": repo,
+                  "default_branch": "main",
+                  "owner": {"name": owner},
+              },
+              "installation": {"id": installation_id},
+              "commits": [],
+          }
+          body = json.dumps(payload).encode("utf-8")
+          with open("payload.json", "wb") as f:
+              f.write(body)
+          with open("signature.txt", "w") as f:
+              f.write("sha256=" + hmac.new(secret, body, hashlib.sha256).hexdigest())
+          with open("delivery_id.txt", "w") as f:
+              f.write(str(uuid.uuid4()))
+          print("Payload built (full sync) for ref:", ref)
+          print(json.dumps(payload, indent=2))
+          PYEOF
+
+      - name: Trigger the sync (signed webhook to the customer admin)
+        env:
+          BASE_DOMAIN: ${{ vars.BASE_DOMAIN }}
+        run: |
+          WEBHOOK_URL="https://admin.${BASE_DOMAIN}.page/hook/github"
+          SIGNATURE=$(cat signature.txt)
+          DELIVERY_ID=$(cat delivery_id.txt)
+          echo "POST $WEBHOOK_URL"
+          HTTP_CODE=$(curl -s -D headers.txt -o response.txt -w "%{http_code}" -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: push" \
+            -H "X-GitHub-Delivery: $DELIVERY_ID" \
+            -H "X-Hub-Signature-256: $SIGNATURE" \
+            --data-binary "@payload.json")
+          echo "--- Response headers ---"; cat headers.txt
+          echo "--- Response body ---"; cat response.txt; echo
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "202" ] && [ "$HTTP_CODE" != "204" ]; then
+            echo "::error::Webhook rejected with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "Webhook accepted ($HTTP_CODE)"
+
+      - name: Report preview URL
+        env:
+          BASE_DOMAIN: ${{ vars.BASE_DOMAIN }}
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO="${GITHUB_REPOSITORY#*/}"
+          echo "Synced. Verify the substituted build here (isolated from live main):"
+          echo "  https://${SYNCED_REF}--${REPO}--${OWNER_LC}.${BASE_DOMAIN}.page/"
+          echo "Compare against production main to confirm byte-identical rendering."

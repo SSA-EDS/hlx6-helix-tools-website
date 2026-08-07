@@ -37,7 +37,7 @@ function constructPayload(form) {
 async function submitForm(form) {
   const payload = constructPayload(form);
   payload.timestamp = new Date().toJSON();
-  const resp = await fetch(`https://form.entmseds.page/main--hlx6-helix-tools-website--ssa-eds${form.dataset.action}`, {
+  const resp = await fetch(`https://form.{{BASE_DOMAIN}}.page/main--hlx6-helix-tools-website--ssa-eds${form.dataset.action}`, {
     method: 'POST',
     cache: 'no-cache',
     headers: {

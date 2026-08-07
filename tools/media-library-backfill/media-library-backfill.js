@@ -1308,9 +1308,9 @@ function toAssetCheckUrl(pathOrUrl, siteAemOrigin) {
   }
 
   assetUrl.hostname = assetUrl.hostname
-    .replace('.hlx.page', '.entmseds.page')
-    .replace('.hlx.live', '.entmseds.page')
-    .replace('.entmseds.live', '.entmseds.page');
+    .replace('.hlx.page', '.{{BASE_DOMAIN}}.page')
+    .replace('.hlx.live', '.{{BASE_DOMAIN}}.page')
+    .replace('.{{BASE_DOMAIN}}.live', '.{{BASE_DOMAIN}}.page');
   return assetUrl.toString();
 }
 
@@ -1685,7 +1685,7 @@ async function processPages(org, site, pages) {
 
   async function fetchPageContent(page) {
     const markdownPath = toMarkdownPath(page.path);
-    const pageUrl = `https://${REF}--${site}--${org}.entmseds.page${markdownPath}`;
+    const pageUrl = `https://${REF}--${site}--${org}.{{BASE_DOMAIN}}.page${markdownPath}`;
     const pageRes = await fetchWithRetry(pageUrl, { redirect: 'manual' }, 1);
     if (pageRes.status === 0 || (pageRes.status >= 300 && pageRes.status < 400)) {
       return {
@@ -1814,7 +1814,7 @@ function buildStandaloneMediaMetadataByIdentity(org, site, standaloneMedia) {
   const metadataByIdentity = new Map();
 
   standaloneMedia.forEach((media) => {
-    const mediaUrl = `https://${REF}--${site}--${org}.entmseds.page${media.path}`;
+    const mediaUrl = `https://${REF}--${site}--${org}.{{BASE_DOMAIN}}.page${media.path}`;
     const mediaIdentity = getMediaIdentity(mediaUrl);
     if (!mediaIdentity) {
       return;
@@ -1857,11 +1857,11 @@ async function populateStandaloneMediaFallbackLastModified(org, site, standalone
     return { attempted: 0, found: 0 };
   }
 
-  log(`Fetching entmseds.page Last-Modified fallback for ${pending.length} standalone media path(s)...`);
+  log(`Fetching {{BASE_DOMAIN}}.page Last-Modified fallback for ${pending.length} standalone media path(s)...`);
   let found = 0;
 
   await runWithConcurrency(pending, async (media) => {
-    const mediaUrl = `https://${REF}--${site}--${org}.entmseds.page${media.path}`;
+    const mediaUrl = `https://${REF}--${site}--${org}.{{BASE_DOMAIN}}.page${media.path}`;
 
     try {
       const lastModified = await fetchLastModified(mediaUrl);
@@ -2074,7 +2074,7 @@ async function runBackfill() {
 
     if (pageFallbackStats.applied > 0 || standaloneFallbackStats.applied > 0) {
       warnForBundle(
-        `Used entmseds.page Last-Modified fallback for ${pageFallbackStats.applied} page(s) and ${standaloneFallbackStats.applied} standalone media path(s); user will remain empty for those entries.`,
+        `Used {{BASE_DOMAIN}}.page Last-Modified fallback for ${pageFallbackStats.applied} page(s) and ${standaloneFallbackStats.applied} standalone media path(s); user will remain empty for those entries.`,
       );
     }
 
@@ -2091,7 +2091,7 @@ async function runBackfill() {
     const eligibleMediaCandidates = mediaCandidates.filter(({ page }) => page.lastModified);
     const skippedCandidateCount = mediaCandidates.length - eligibleMediaCandidates.length;
     if (skippedCandidateCount > 0) {
-      warnForBundle(`Skipping ${skippedCandidateCount} media candidate(s) whose source page had neither detailed status metadata nor an entmseds.page Last-Modified fallback.`);
+      warnForBundle(`Skipping ${skippedCandidateCount} media candidate(s) whose source page had neither detailed status metadata nor an {{BASE_DOMAIN}}.page Last-Modified fallback.`);
     }
 
     const { entries: initialEntries, dupes } = createDeterministicEntries(eligibleMediaCandidates);
@@ -2109,7 +2109,7 @@ async function runBackfill() {
     );
     const existingMediaPaths = new Set(entries.map(({ entry }) => getMediaIdentity(entry.path)));
     standaloneMedia.forEach((media) => {
-      const mediaUrl = `https://${REF}--${site}--${org}.entmseds.page${media.path}`;
+      const mediaUrl = `https://${REF}--${site}--${org}.{{BASE_DOMAIN}}.page${media.path}`;
       const mediaIdentity = getMediaIdentity(mediaUrl);
       stats.media += 1;
       if (existingMediaPaths.has(mediaIdentity)) {

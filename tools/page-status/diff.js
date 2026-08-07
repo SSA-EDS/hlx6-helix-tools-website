@@ -7,7 +7,7 @@ import filterPendingPages from './diff-utils.js';
 import { fetchHosts } from './utils.js';
 
 // Lazy-load Dark Alley converter module
-const CONVERTERS_URL = 'https://main--hlx6-da-nx--ssa-eds.entmseds.live/nx/utils/converters.js';
+const CONVERTERS_URL = 'https://main--hlx6-da-nx--ssa-eds.{{BASE_DOMAIN}}.live/nx/utils/converters.js';
 let admin;
 let mdToDocDom;
 

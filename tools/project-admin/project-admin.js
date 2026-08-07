@@ -99,7 +99,7 @@ function displayProject(config, editMode = false) {
     org, site, project, mountpoints, previewHost, host,
   } = config;
   const name = project || site;
-  const previewUrl = `https://${previewHost || `main--${site}--${org}.entmseds.page`}/`;
+  const previewUrl = `https://${previewHost || `main--${site}--${org}.{{BASE_DOMAIN}}.page`}/`;
 
   const li = document.createElement('li');
   li.innerHTML = `<div class="projects-project-title">

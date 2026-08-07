@@ -16,7 +16,7 @@ export const BEDROCK_CONFIG = {
 export const DA_CONFIG = {
   ORG: 'adobe',
   REPO: 'helix-optel',
-  BASE_URL: 'https://admin.entmseds-da.live/source',
+  BASE_URL: 'https://admin.{{BASE_DOMAIN}}-da.live/source',
   UPLOAD_PATH: 'optel-reports',
   WORKER_URL: 'https://optel-da-upload.adobeaem.workers.dev/',
 };

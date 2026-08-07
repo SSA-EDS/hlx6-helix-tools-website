@@ -216,7 +216,7 @@
     "liveHost": {
       "type": "string",
       "format": "hostname",
-      "description": "The host name of the live environment (overrides cdn.live.host, defaults to *.entmseds.live)"
+      "description": "The host name of the live environment (overrides cdn.live.host, defaults to *.{{BASE_DOMAIN}}.live)"
     },
     "plugins": {
       "type": "array",
@@ -227,7 +227,7 @@
     "previewHost": {
       "type": "string",
       "format": "hostname",
-      "description": "The host name of the preview environment (overrides cdn.preview.host, defaults to *.entmseds.page)"
+      "description": "The host name of the preview environment (overrides cdn.preview.host, defaults to *.{{BASE_DOMAIN}}.page)"
     },
     "project": {
       "type": "string",
@@ -236,7 +236,7 @@
     "reviewHost": {
       "type": "string",
       "format": "hostname",
-      "description": "The host name of the review environment (overrides cdn.review.host, defaults to *.entmseds.reviews)"
+      "description": "The host name of the review environment (overrides cdn.review.host, defaults to *.{{BASE_DOMAIN}}.reviews)"
     },
     "specialViews": {
       "type": "array",
