@@ -1,4 +1,4 @@
-name: templatetest - Substitute + Sync to customer repo (BASE_DOMAIN)
+name: hlx6-ca-central-1 - Sync to Customer Repo (BASE_DOMAIN)
 
 # TEMPLATIZE TEST (SSA multi-customer DA code-sync RFC, Phase 3 / variant (a), repo-per-customer).
 # Runs against this repo's `templatetest` branch (the template, with the customer domain
@@ -61,7 +61,7 @@ on:
 permissions:
   contents: read   # this repo is only read from; the destination repo is written via PAT, not GITHUB_TOKEN
 
-concurrency: templatetest-sync   # prevent overlapping runs racing the destination repo's main
+concurrency: hlx6-ca-central-1-sync-to-customer-repo   # prevent overlapping runs racing the destination repo's main
 
 env:
   TEMPLATE_REF: templatetest
