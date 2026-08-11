@@ -100,6 +100,7 @@ jobs:
           DEST_REPO: ${{ vars.DEST_REPO }}
           DEST_REPO_TOKEN: ${{ secrets.DEST_REPO_TOKEN }}
         run: |
+          echo "DEST_REPO_TOKEN length: ${#DEST_REPO_TOKEN} (fine-grained PATs are ~93 chars; 0 means the secret isn't arriving)"
           git remote add dest "https://x-access-token:${DEST_REPO_TOKEN}@github.com/SSA-EDS/${DEST_REPO}.git"
           if git fetch dest main; then
             echo "Found existing dest main - incremental diff is possible."
