@@ -101,9 +101,10 @@ jobs:
           DEST_REPO_TOKEN: ${{ secrets.DEST_REPO_TOKEN }}
         run: |
           git remote add dest "https://x-access-token:${DEST_REPO_TOKEN}@github.com/SSA-EDS/${DEST_REPO}.git"
-          if git fetch dest main 2>/dev/null; then
+          if git fetch dest main; then
             echo "Found existing dest main - incremental diff is possible."
           else
+            echo "git fetch exit code: $? (expected/benign if the destination repo simply has no 'main' ref yet; a real auth failure will show as 'Repository not found' above, not just a nonzero exit)"
             echo "No existing dest main (first run) - this run will full-sync regardless of mode."
           fi
 
