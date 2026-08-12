@@ -77,6 +77,13 @@ jobs:
         with:
           ref: templatetest
           fetch-depth: 0
+          persist-credentials: false   # actions/checkout otherwise sets a global git
+                                        # http.extraheader with the default GITHUB_TOKEN for
+                                        # all of github.com, which silently overrides any other
+                                        # credential (e.g. our PAT) embedded in a remote URL
+                                        # later in this job - this is very likely the actual
+                                        # root cause of every 'Repository not found'/403 seen
+                                        # in this cross-repo push investigation.
 
       - name: Validate required config
         env:
