@@ -65,6 +65,7 @@ concurrency: hlx6-ca-central-1-sync-to-customer-repo   # prevent overlapping run
 
 env:
   TEMPLATE_REF: templatetest
+  APP_ID: "4369442"   # helix-eds-ca App id (org-wide, same for every customer)
 
 jobs:
   substitute-and-sync:
@@ -95,12 +96,21 @@ jobs:
           echo "DEST_REPO=$DEST_REPO"
           echo "BASE_DOMAIN=$BASE_DOMAIN"
 
+      - name: Mint short-lived installation token for the destination repo
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: SSA-EDS
+          repositories: ${{ vars.DEST_REPO }}
+
       - name: Add destination repo remote and fetch its current main (if any)
         env:
           DEST_REPO: ${{ vars.DEST_REPO }}
-          DEST_REPO_TOKEN: ${{ secrets.DEST_REPO_TOKEN }}
+          DEST_REPO_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          echo "DEST_REPO_TOKEN length: ${#DEST_REPO_TOKEN} (fine-grained PATs are ~93 chars; 0 means the secret isn't arriving)"
+          echo "DEST_REPO_TOKEN length: ${#DEST_REPO_TOKEN} (App installation tokens are ~40 chars; 0 means minting failed)"
           echo "DEST_REPO length: ${#DEST_REPO}, value: [${DEST_REPO}]"
           DEST_URL="https://x-access-token:${DEST_REPO_TOKEN}@github.com/SSA-EDS/${DEST_REPO}.git"
           echo "Constructed URL (token auto-masked by Actions): $DEST_URL"
