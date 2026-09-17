@@ -1,4 +1,4 @@
-const WORKER = 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev';
+const WORKER = 'https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev';
 
 // Normalizes an id/path to leading-slash form with each segment URL-encoded,
 // so paths containing spaces or reserved characters produce a valid URL.

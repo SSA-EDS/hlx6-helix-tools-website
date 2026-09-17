@@ -123,7 +123,7 @@ describe('scheduler:utils.js', () => {
         await schedulePageApi({
           org: 'o', site: 's', path: '/x', scheduledPublish: '2099-01-01T00:00:00Z', nonce: 'n1',
         });
-        assert.equal(captured.url, 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev/schedule/page/o/s');
+        assert.equal(captured.url, 'https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev/schedule/page/o/s');
         const body = JSON.parse(captured.opts.body);
         assert.deepEqual(Object.keys(body).sort(), ['nonce', 'path', 'scheduledPublish']);
       } finally {

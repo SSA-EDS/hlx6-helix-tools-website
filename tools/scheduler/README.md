@@ -1,7 +1,7 @@
 # Scheduler
 
 Manage scheduled publishes for pages and snapshots, backed by the
-[helix-snapshot-scheduler](https://helix-snapshot-scheduler-prod.adobeaem.workers.dev)
+[helix-snapshot-scheduler](https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev)
 worker.
 
 The tool ships two entry points in the same folder:
