@@ -1,10 +1,9 @@
-import { analyzeUrls } from './utils.js';
-import getAdminClient from '../../scripts/admin-compat.js';
+import { analyzeUrls, extractOrgSite } from './utils.js';
+import { getAdminClientForSite } from '../../scripts/admin-compat.js';
 import { executeAdminRequest, AuthMode } from '../../utils/admin-request.js';
 
 const log = document.getElementById('logger');
 const adminVersion = new URLSearchParams(window.location.search).get('hlx-admin-version');
-const adminVersionParams = adminVersion ? { 'hlx-admin-version': adminVersion } : undefined;
 
 const append = (string, status = 'unknown') => {
   const p = document.createElement('p');
@@ -186,7 +185,6 @@ const showSanitizationWarning = (changes) => {
 
 document.getElementById('urls-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const admin = await getAdminClient();
   let counter = 0;
 
   const rawUrls = document.getElementById('urls').value
@@ -229,6 +227,12 @@ document.getElementById('urls-form').addEventListener('submit', async (e) => {
     return false;
   }
 
+  // All URLs in a run target the same site; detect the backend from the first
+  // one and pick the matching admin client (H5 admin.hlx.page or H6 api.aem.live).
+  const firstCoords = extractOrgSite(urlsToUse[0]);
+  let admin = await getAdminClientForSite(firstCoords);
+  if (adminVersion) admin = admin.pinVersion(adminVersion);
+
   const operation = document.getElementById('operation').dataset.value;
   const slow = document.getElementById('slow').checked;
   const forceUpdate = document.getElementById('force').checked;
@@ -245,8 +249,8 @@ document.getElementById('urls-form').addEventListener('submit', async (e) => {
     const resource = admin[endpoint]({ org: owner, site: repo, ref: branch });
     return executeAdminRequest(
       () => (method === 'DELETE'
-        ? resource.remove(pathname, { params: adminVersionParams })
-        : resource.update(pathname, null, { params: adminVersionParams })),
+        ? resource.remove(pathname)
+        : resource.update(pathname, null)),
       { org: owner, site: repo, policy },
     );
   };
@@ -284,7 +288,7 @@ document.getElementById('urls-form').addEventListener('submit', async (e) => {
       const paths = urlsToUse.map((url) => new URL(url).pathname);
       const bulkResp = await executeAdminRequest(
         () => admin[operation]({ org: owner, site: repo, ref: branch })
-          .update('/*', JSON.stringify({ paths, forceUpdate }), { params: adminVersionParams }),
+          .bulk({ paths, forceUpdate }),
         { org: owner, site: repo, policy: AuthMode.PREFLIGHT_AND_RETRY },
       );
       if (!bulkResp) {
@@ -296,11 +300,14 @@ document.getElementById('urls-form').addEventListener('submit', async (e) => {
       } else {
         const { job } = await bulkResp.json();
         const { name } = job;
+        // H6 job topics differ from the operation (e.g. live -> live-publish);
+        // job.topic is echoed by H6's start response and absent on H5.
+        const jobTopic = job.topic || VERB[operation];
         const jobStatusPoll = window.setInterval(async () => {
           try {
             const jobResp = await executeAdminRequest(
               () => admin.job({ org: owner, site: repo, ref: branch })
-                .get(`${VERB[operation]}/${name}/details`),
+                .get(`${jobTopic}/${name}/details`),
               { org: owner, site: repo, policy: AuthMode.NONE },
             );
             const jobStatus = await jobResp.json();
@@ -313,7 +320,8 @@ document.getElementById('urls-form').addEventListener('submit', async (e) => {
             } = jobStatus;
             if (state === 'stopped') {
               window.clearInterval(jobStatusPoll);
-              resources.forEach((res) => append(`${res.path} (${res.status})`, res.status));
+              // H5 resources carry `path`; H6 carries `resourcePath`.
+              resources.forEach((res) => append(`${res.resourcePath || res.path} (${res.status})`, res.status));
               bulkLog.textContent = bulkText.replace('$1', processed);
               const duration = (new Date(stopTime).valueOf()
                 - new Date(startTime).valueOf()) / 1000;

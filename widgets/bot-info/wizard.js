@@ -6,9 +6,7 @@
  * editable user rows and content-source fields used by the single-page form.
  */
 
-// Mirror of the roles offered by the user-admin tool. Duplicated here (rather
-// than imported) so the wizard stays decoupled from that tool's UI module.
-export const ROLES = ['admin', 'author', 'publish', 'develop', 'basic_author', 'basic_publish', 'config', 'config_admin'];
+import { createRolesField } from '../../utils/roles/roles-field.js';
 
 // UI-facing content-source kinds. `configType` is what the admin API stores in
 // `content.source.type`; the granular DA/AEM/BYOM kinds all map to `markup`.
@@ -17,15 +15,17 @@ export const CONTENT_SOURCE_KINDS = [
   { value: 'da', label: 'Document Authoring (DA)', configType: 'markup' },
   { value: 'onedrive', label: 'SharePoint', configType: 'onedrive' },
   { value: 'google', label: 'Google Drive', configType: 'google' },
-  { value: 'aem', label: 'AEM', configType: 'markup' },
+  { value: 'aem', label: 'Built-in (api.aem.live)', configType: 'markup' },
   {
     value: 'byom', label: 'Other (bring your own markup)', configType: 'markup', suffix: true,
   },
 ];
 
 /**
- * Guess the UI content-source kind from a content URL. Mirrors the detection in
- * site-admin's `buildSiteConfig`/`getContentSourceType`.
+ * Guess the UI content-source kind from a content URL. `aem` only matches the
+ * fixed connector format (`https://api.aem.live/...`) — an `adobeaemcloud.com`
+ * URL is an arbitrary markup source (e.g. a franklin.delivery URL), not that
+ * fixed format, so it falls through to `byom`.
  *
  * @param {string} url
  * @returns {'da'|'aem'|'google'|'onedrive'|'byom'}
@@ -35,7 +35,7 @@ export function detectContentSourceKind(url) {
   if (url.startsWith('https://drive.google.com/drive')) return 'google';
   if (url.includes('sharepoint.com/')) return 'onedrive';
   if (url.startsWith('https://content.entmseds-da.live')) return 'da';
-  if (url.startsWith('https://api.entmseds.live/') || url.includes('adobeaemcloud')) return 'aem';
+  if (url.startsWith('https://api.entmseds.live/')) return 'aem';
   return 'byom';
 }
 
@@ -99,62 +99,36 @@ export function diffOrgUsers(original = [], current = []) {
   return { toAdd, toRemove, toUpdate };
 }
 
-/* ------------------------------------------------------------------ */
-/* DOM builders (not unit-tested)                                     */
-/* ------------------------------------------------------------------ */
-
-function createRolePill(role, checked) {
-  const label = document.createElement('label');
-  label.className = 'bot-info-role-pill';
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.value = role;
-  checkbox.checked = checked;
-  const span = document.createElement('span');
-  span.textContent = role;
-  label.append(checkbox, span);
-  return label;
+/**
+ * Validate the content-source selection for the Content step. Only the
+ * "different content source" (advanced) path needs a URL; the DA default is
+ * always valid.
+ *
+ * @param {{advanced: boolean, url: string}} selection
+ * @returns {string|null} an error message, or null when valid
+ */
+export function validateContentSelection({ advanced, url }) {
+  if (advanced && !url.trim()) return 'Enter a content source URL.';
+  return null;
 }
 
 /**
- * Build the role pills for a user. The primary `admin` pill is always visible;
- * the remaining roles stay tucked behind a `…` link unless one of them is
- * already selected.
+ * Validate the collected users for the Users step. Site users are optional —
+ * site access can be inherited from the org — but a new org must have at least
+ * one org user.
  *
- * @param {string[]} selectedRoles
- * @returns {HTMLElement}
+ * @param {{email: string}[]} orgUsers
+ * @param {boolean} newOrg
+ * @returns {string|null} an error message, or null when valid
  */
-function createRolePills(selectedRoles = []) {
-  const [primary, ...others] = ROLES;
-  const container = document.createElement('div');
-  container.className = 'bot-info-roles';
-
-  container.append(createRolePill(primary, selectedRoles.includes(primary)));
-
-  const rest = document.createElement('div');
-  rest.className = 'bot-info-roles-rest';
-  others.forEach((role) => rest.append(createRolePill(role, selectedRoles.includes(role))));
-  // reveal the rest up-front if any of those roles is already selected
-  const expanded = others.some((role) => selectedRoles.includes(role));
-  rest.setAttribute('aria-hidden', String(!expanded));
-  container.append(rest);
-
-  const more = document.createElement('button');
-  more.type = 'button';
-  more.className = 'bot-info-roles-more';
-  more.setAttribute('aria-expanded', String(expanded));
-  more.title = 'Show more roles';
-  more.textContent = expanded ? '‹' : '…';
-  more.addEventListener('click', () => {
-    const isExpanded = rest.getAttribute('aria-hidden') === 'false';
-    rest.setAttribute('aria-hidden', String(isExpanded));
-    more.setAttribute('aria-expanded', String(!isExpanded));
-    more.textContent = isExpanded ? '…' : '‹';
-  });
-  container.append(more);
-
-  return container;
+export function usersError(orgUsers, newOrg) {
+  if (newOrg && orgUsers.length === 0) return 'Add at least one organization user before saving.';
+  return null;
 }
+
+/* ------------------------------------------------------------------ */
+/* DOM builders (not unit-tested)                                     */
+/* ------------------------------------------------------------------ */
 
 /**
  * Build an editable user row (email + role pills + remove button). The original
@@ -173,13 +147,13 @@ export function createUserRow(user = {}, defaultRole = 'admin') {
   emailField.className = 'bot-info-field';
   const emailInput = document.createElement('input');
   emailInput.type = 'email';
-  emailInput.required = true;
+  emailInput.required = Object.hasOwn(user, 'email') || !!user.id;
   emailInput.placeholder = 'name@example.com';
   emailInput.className = 'bot-info-email';
   emailInput.value = user.email || '';
   emailField.append(emailInput);
 
-  const pills = createRolePills(user.roles && user.roles.length ? user.roles : [defaultRole]);
+  const pills = createRolesField(user.roles && user.roles.length ? user.roles : [defaultRole]);
 
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
@@ -202,7 +176,7 @@ export function createUserRow(user = {}, defaultRole = 'admin') {
 export function collectUsers(listEl) {
   return [...listEl.querySelectorAll('.bot-info-user-row')].map((row) => {
     const email = row.querySelector('.bot-info-email').value.trim();
-    const roles = [...row.querySelectorAll('.bot-info-roles input:checked')].map((c) => c.value);
+    const roles = [...row.querySelectorAll('.roles-field input:checked')].map((c) => c.value);
     const { userId } = row.dataset;
     return userId ? { email, id: userId, roles } : { email, roles };
   }).filter((u) => u.email);
