@@ -17,8 +17,8 @@ function dispatchProfileEvent(event, detail = {}) {
 }
 
 function confirmInstallSidekick(resp) {
-  if (resp === NO_SIDEKICK && confirm('AEM Sidekick is required to sign in. Install now?')) {
-    window.open('https://chromewebstore.google.com/detail/aem-sidekick/igkmdomcgoebiipaifhmpfjhbjccggml', '_blank');
+  if (resp === NO_SIDEKICK && confirm('AEM Sidekick - SSA - eds-ca is required to sign in. Install now?')) {
+    window.open('https://entmseds-da.live/sidekick', '_blank');
   }
 }
 
