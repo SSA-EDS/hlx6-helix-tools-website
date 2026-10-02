@@ -4,7 +4,12 @@ import {
   detectContentSourceKind,
   buildContentSource,
   diffOrgUsers,
+  validateContentSelection,
+  usersError,
+  createUserRow,
+  collectUsers,
 } from '../../../widgets/bot-info/wizard.js';
+import { userEmailErrors } from '../../../tools/user-admin/utils.js';
 
 describe('bot-info:wizard.js', () => {
   describe('detectContentSourceKind', () => {
@@ -25,13 +30,17 @@ describe('bot-info:wizard.js', () => {
       assert.equal(detectContentSourceKind('https://content.entmseds-da.live/org/site'), 'da');
     });
 
-    it('detects AEM (api.entmseds.live and legacy adobeaemcloud)', () => {
+    it('detects AEM (api.entmseds.live only)', () => {
       assert.equal(detectContentSourceKind('https://api.entmseds.live/org/sites/site/source'), 'aem');
-      assert.equal(detectContentSourceKind('https://author-p123.adobeaemcloud.com/'), 'aem');
     });
 
-    it('falls back to byom for unknown markup hosts', () => {
+    it('falls back to byom for unknown markup hosts, including adobeaemcloud/franklin.delivery', () => {
       assert.equal(detectContentSourceKind('https://example.com/content'), 'byom');
+      assert.equal(detectContentSourceKind('https://author-p123.adobeaemcloud.com/'), 'byom');
+      assert.equal(
+        detectContentSourceKind('https://author-p130360-e1272151.adobeaemcloud.com/bin/franklin.delivery/adobe-rnd/aem-boilerplate-xwalk/main'),
+        'byom',
+      );
     });
   });
 
@@ -142,6 +151,71 @@ describe('bot-info:wizard.js', () => {
 
     it('handles empty inputs', () => {
       assert.deepEqual(diffOrgUsers(), { toAdd: [], toRemove: [], toUpdate: [] });
+    });
+  });
+
+  describe('validateContentSelection', () => {
+    it('accepts the DA default (not advanced)', () => {
+      assert.equal(validateContentSelection({ advanced: false, url: '' }), null);
+    });
+
+    it('rejects an empty url when advanced', () => {
+      assert.equal(
+        validateContentSelection({ advanced: true, url: '   ' }),
+        'Enter a content source URL.',
+      );
+    });
+
+    it('accepts a url when advanced', () => {
+      assert.equal(
+        validateContentSelection({ advanced: true, url: 'https://example.com' }),
+        null,
+      );
+    });
+  });
+
+  describe('new user rows', () => {
+    it('ignores a blank new row in validation and collection', () => {
+      const list = document.createElement('div');
+      list.append(createUserRow({ email: 'a@b.com' }), createUserRow());
+      assert.deepEqual(userEmailErrors(list.querySelectorAll('.bot-info-email')), []);
+      assert.deepEqual(collectUsers(list), [{ email: 'a@b.com', roles: ['admin'] }]);
+    });
+
+    it('does not silently remove an existing user whose email is cleared', () => {
+      const row = createUserRow({ email: 'a@b.com' });
+      const input = row.querySelector('.bot-info-email');
+      input.value = '';
+      assert.deepEqual(userEmailErrors([input]), [{
+        input,
+        message: 'Enter an email for each user, or remove the empty user.',
+      }]);
+    });
+
+    it('still requires an organization user when all new rows are blank', () => {
+      const list = document.createElement('div');
+      list.append(createUserRow());
+      assert.deepEqual(userEmailErrors(list.querySelectorAll('.bot-info-email')), []);
+      assert.equal(usersError(collectUsers(list), true), 'Add at least one organization user before saving.');
+    });
+  });
+
+  describe('usersError', () => {
+    const someUsers = [{ email: 'a@b.com' }];
+
+    it('requires at least one org user for a new org', () => {
+      assert.equal(
+        usersError([], true),
+        'Add at least one organization user before saving.',
+      );
+    });
+
+    it('allows no users for an existing org (site access can be inherited)', () => {
+      assert.equal(usersError([], false), null);
+    });
+
+    it('passes when a new org has an org user', () => {
+      assert.equal(usersError(someUsers, true), null);
     });
   });
 });
