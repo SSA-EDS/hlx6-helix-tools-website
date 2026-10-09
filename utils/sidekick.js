@@ -1,4 +1,4 @@
-const SIDEKICK_ID = 'cnolboddjdgnfgbcpfnnoojhnmjfdbem';
+const SIDEKICK_ID = 'bobfaahioddffdkhnphohpkoehmcedib';
 
 export const NO_SIDEKICK = 'no-sidekick';
 
